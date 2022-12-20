@@ -46,7 +46,7 @@ app.get('/:from,:to,:type', async (request, response) => {
         return response.send(result.main[6]).end()
     }
 })
-const PORT = 3000
+const PORT = 80
 app.listen(PORT, () => {
     console.log('Server running on port ' + PORT)
 })
