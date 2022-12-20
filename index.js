@@ -1,13 +1,13 @@
 const express = require('express');
 const app = express()
 var api = require('./icao');
-
+const PORT = process.env.PORT || 3030;
 
 'use strict';
 
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('webScraper/country.json');
+const rawdata = fs.readFileSync('country.json');
 const countries = JSON.parse(rawdata);
 // console.log(countries);
 
@@ -46,7 +46,7 @@ app.get('/:from,:to,:type', async (request, response) => {
         return response.send(result.main[6]).end()
     }
 })
-const PORT = 80
+
 app.listen(PORT, () => {
-    console.log('Server running on port ' + PORT)
+    console.log(`server started on port ${PORT}`)
 })
