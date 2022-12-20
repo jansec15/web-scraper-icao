@@ -7,7 +7,7 @@ var api = require('./icao');
 
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('country.json');
+const rawdata = fs.readFileSync('./country.json');
 const countries = JSON.parse(rawdata);
 // console.log(countries);
 
