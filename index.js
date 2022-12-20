@@ -39,7 +39,7 @@ app.get('/:from&:to&:type', async (request, response) => {
         }
     }
     // return response.send(data).end()
-    const result = await api.icao(data.from, data.to)
+    const result = await api.icao(data.from, data.to) || null
     // console.log(result)
     if (result == null) {
         response.status(404).end()

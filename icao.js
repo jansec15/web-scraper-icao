@@ -5,7 +5,10 @@ const puppeteer = require('puppeteer');
 
 async function icao(from, to) {
     const start = new Date();
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({
+        executablePath: '/usr/bin/chromium-browser'
+      })
+    // const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     await page.exposeFunction("getFrom", function () {
