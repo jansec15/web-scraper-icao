@@ -12,7 +12,7 @@ const countries = JSON.parse(rawdata);
 // console.log(countries);
 
 
-app.get('/:from,:to,:type', async (request, response) => {
+app.get('/:from&:to&:type', async (request, response) => {
     let data = request.params
     data.from = data.from.toUpperCase()
     data.to = data.to.toUpperCase()
@@ -25,8 +25,8 @@ app.get('/:from,:to,:type', async (request, response) => {
         const from = {}
         const to = {}
         for (let country in countries) {
-            countries[country].includes(data.from) && Object.keys(from).length < 1 ? from[country] = countries[country] : ''
-            countries[country].includes(data.to) && Object.keys(to).length < 1 ? to[country] = countries[country] : ''
+            countries[country].startsWith(data.from) && Object.keys(from).length < 1 ? from[country] = countries[country] : ''
+            countries[country].startsWith(data.to) && Object.keys(to).length < 1 ? to[country] = countries[country] : ''
         }
         console.log(from)
         console.log(to)
@@ -40,7 +40,7 @@ app.get('/:from,:to,:type', async (request, response) => {
     }
     // return response.send(data).end()
     const result = await api.icao(data.from, data.to)
-    console.log(result)
+    // console.log(result)
     if (result == null) {
         response.status(404).end()
         return null
