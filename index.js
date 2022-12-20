@@ -38,18 +38,18 @@ app.get('/:from,:to,:type', async (request, response) => {
             Object.keys(to).length > 0 ? data.to = Object.keys(to)[0] : ''
         }
     }
-    return response.send(data).end()
-    // const result = await api.icao(data.from, data.to)
-    // console.log(result)
-    // if (result == null) {
-    //     response.status(404).end()
-    //     return null
-    // }
-    // if (data.type=='ida') {
-    //     return response.send(result.detail1[result.detail1.length-1]).end()
-    // } else {
-    //     return response.send(result.main[result.main.length-1]).end()
-    // }
+    // return response.send(data).end()
+    const result = await api.icao(data.from, data.to)
+    console.log(result)
+    if (result == null) {
+        response.status(404).end()
+        return null
+    }
+    if (data.type=='ida') {
+        return response.send(result.detail1[result.detail1.length-1]).end()
+    } else {
+        return response.send(result.main[result.main.length-1]).end()
+    }
 })
 
 app.listen(PORT, () => {
