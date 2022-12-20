@@ -46,9 +46,9 @@ app.get('/:from,:to,:type', async (request, response) => {
         return null
     }
     if (data.type=='ida') {
-        return response.send(result.detail1[6]).end()
+        return response.send(result.detail1[result.detail1.length-1]).end()
     } else {
-        return response.send(result.main[6]).end()
+        return response.send(result.main[result.main.length-1]).end()
     }
 })
 
