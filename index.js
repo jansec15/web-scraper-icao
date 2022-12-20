@@ -16,6 +16,8 @@ app.get('/:from,:to,:type', async (request, response) => {
     let data = request.params
     data.from = data.from.toUpperCase()
     data.to = data.to.toUpperCase()
+    console.log(data.from)
+    console.log(data.to)
     if (!data.from || !data.to || data.from == '' || data.to == '') {
         return response.status(404).end()
     }
@@ -26,6 +28,8 @@ app.get('/:from,:to,:type', async (request, response) => {
             countries[country].includes(data.from) && Object.keys(from).length < 1 ? from[country] = countries[country] : ''
             countries[country].includes(data.to) && Object.keys(to).length < 1 ? to[country] = countries[country] : ''
         }
+        console.log(from)
+        console.log(to)
         if (Object.keys(to).length < 1 || Object.keys(from).length < 1) {
             response.status(404).end()
             return null
@@ -36,6 +40,7 @@ app.get('/:from,:to,:type', async (request, response) => {
     }
 
     const result = await api.icao(data.from, data.to)
+    console.log(result)
     if (result == null) {
         response.status(404).end()
         return null
