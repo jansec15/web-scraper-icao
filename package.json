@@ -1,20 +1,22 @@
 {
-  "name": "juan_scraper",
+  "name": "webscraper",
   "version": "1.0.0",
-  "description": "a web scraper",
+  "description": "My New Project description.",
   "main": "index.js",
+  "repository": {
+    "url": "https://github.com/jansec15/web-scraper-icao",
+    "type": "git"
+  },
   "scripts": {
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "author": "juan",
-  "license": "ISC",
+  "author": "Juan",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "puppeteer-core": "^19.4.1",
     "puppeteer": "^19.4.1"
-    
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
