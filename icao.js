@@ -1,7 +1,7 @@
 
 const baseurl = "https://applications.icao.int/icec";
 
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 
 async function icao(from, to) {
     const start = new Date();
