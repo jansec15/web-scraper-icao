@@ -71,7 +71,6 @@ async function icao(from, to) {
     await page.goto(baseurl);
     // await page.screenshot({ path: 'icao1.jpg' });
     await page.waitForSelector('form');
-    // await page.waitForTimeout(1000);
     await page.type(".frm1", from);
     await page.waitForSelector('#ui-id-1 li');
     // await page.screenshot({ path: 'icao1.jpg' });
@@ -142,7 +141,6 @@ async function icao(from, to) {
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
-    return formId;
 
 }
 module.exports = {
