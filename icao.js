@@ -19,7 +19,8 @@ async function icao(from, to) {
         silent: false,
     };
     const stats = await PCR(option);
-    const browser = await stats.puppeteer.launch({
+    process.env.PUPPETEER_EXECUTABLE_PATH = stats.executablePath;
+    const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         headless: true,
         args: ["--no-sandbox"],
