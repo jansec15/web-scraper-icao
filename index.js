@@ -38,11 +38,11 @@ app.get('/:from&:to&:type', async (request, response) => {
         }
     }
     // return response.send(data).end()
-    const result = await api.icao(data.from, data.to) || null
+    const result = await api.icao(data.from, data.to)
     // console.log(result)
     if (result == null) {
         response.status(404).end()
-        return null
+        return response.json({'result':result}).end()
     }
     if (data.type == '1') {
         return response.json({'result':result.detail1[result.detail1.length - 1]}).end()
