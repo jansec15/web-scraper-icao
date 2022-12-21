@@ -66,6 +66,7 @@ async function icao(from, to) {
     });
     //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
+    await page.setViewport({width:960,height:768});
     await page.goto(baseurl);
     // await page.screenshot({ path: 'icao1.jpg' });
     await page.waitForSelector('form');
@@ -76,7 +77,7 @@ async function icao(from, to) {
     //busca el id en la lista de origen
 
     const formId = await page.evaluate(async () => {
-        return document
+        // return document
         txt = document.querySelector('#ui-id-1').innerHTML;
 
         const ids = await getIds(txt);
@@ -86,7 +87,7 @@ async function icao(from, to) {
         }
         return null;
     });
-    return formId
+    // return formId
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
