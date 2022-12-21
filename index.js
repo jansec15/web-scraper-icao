@@ -22,32 +22,36 @@ app.get('/:from&:to&:type', async (request, response) => {
         return response.status(404).end()
     }
     if (!countries[data.from] || !countries[data.to]) {
-        const from = countries[data.from] || {}
-        const to = countries[data.to] || {}
+        const from = countries[data.from] ? data.from : {}
+        const to = countries[data.to] ? data.to : {}
         for (let country in countries) {
-            if(countries[country].startsWith(data.from) && Object.keys(from).length < 1) from[country] = countries[country];
+            if (countries[country].startsWith(data.from) && Object.keys(from).length < 1) from[country] = countries[country];
 
-            if(countries[country].startsWith(data.to) && Object.keys(to).length < 1)  to[country] = countries[country];
+            if (countries[country].startsWith(data.to) && Object.keys(to).length < 1) to[country] = countries[country];
         }
         if (Object.keys(to).length < 1 || Object.keys(from).length < 1) {
             response.status(404).end()
             return null
         } else {
-            Object.keys(from).length > 0 ? data.from = Object.keys(from)[0] : ''
-            Object.keys(to).length > 0 ? data.to = Object.keys(to)[0] : ''
+            // console.log(from)
+            // console.log(to)
+            Object.keys(from).length > 0 && !countries[data.from] ? data.from = Object.keys(from)[0] : ''
+
+            Object.keys(to).length > 0 && !countries[data.to] ? data.to = Object.keys(to)[0] : ''
         }
     }
     // return response.send(data).end()
     const result = await api.icao(data.from, data.to)
+    // return response.json({'result':result}).end()
     // console.log(result)
     if (result == null) {
-        response.status(404).end()
-        return response.json({'result':result}).end()
+        // response.status(404).end()
+        return response.json({ 'result': null }).end()
     }
     if (data.type == '1') {
-        return response.json({'result':result.detail1[result.detail1.length - 1]}).end()
+        return response.json({ 'result': result.detail1[result.detail1.length - 1] }).end()
     } else {
-        return response.json({'result':result.main[result.main.length - 1]}).end()
+        return response.json({ 'result': result.main[result.main.length - 1] }).end()
     }
 })
 

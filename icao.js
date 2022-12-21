@@ -72,7 +72,7 @@ async function icao(from, to) {
     // await page.waitForTimeout(1000);
     await page.type(".frm1", from);
     await page.waitForSelector('#ui-id-1 li');
-    await page.screenshot({ path: 'icao1.jpg' });
+    // await page.screenshot({ path: 'icao1.jpg' });
     //busca el id en la lista de origen
     const formId = await page.evaluate(async () => {
         try {
@@ -140,6 +140,7 @@ async function icao(from, to) {
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
+    return formId;
 
 }
 module.exports = {
