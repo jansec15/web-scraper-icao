@@ -45,9 +45,9 @@ app.get('/:from&:to&:type', async (request, response) => {
         return null
     }
     if (data.type == '1') {
-        return response.send(result.detail1[result.detail1.length - 1]).end()
+        return response.json({'result':result.detail1[result.detail1.length - 1]}).end()
     } else {
-        return response.send(result.main[result.main.length - 1]).end()
+        return response.json({'result':result.main[result.main.length - 1]}).end()
     }
 })
 
