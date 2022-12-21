@@ -29,13 +29,15 @@ async function icao(from, to) {
     });
     // const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
-
+    console.log(1)
     await page.exposeFunction("getFrom", function () {
         return '(' + from + ' ';
     });
+    console.log(2)
     await page.exposeFunction("getTo", function () {
         return '(' + to + ' ';
     });
+    console.log(3)
     await page.exposeFunction("getIds", function (txt) {
         const tmp = {};
         const indices = [];
@@ -64,7 +66,9 @@ async function icao(from, to) {
         }
         return ids;
     });
+    console.log(4)
     await page.goto(baseurl);
+    console.log(5)
     await page.waitForSelector('form');
     await page.waitForTimeout(1000);
     await page.type(".frm1", from);
