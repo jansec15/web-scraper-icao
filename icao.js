@@ -21,8 +21,8 @@ async function icao(from, to) {
     };
     const stats = await PCR(option);
     const browser = await stats.puppeteer.launch({
-        headless: false,
-        args: ["--no-sandbox",'--disable-setuid-sandbox'],
+        headless: true,
+        args: ["--no-sandbox",'--disable-setuid-sandbox','--use-gl=egl'],
         executablePath: stats.executablePath,
         env: {
             DISPLAY: ":0"
