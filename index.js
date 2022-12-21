@@ -10,7 +10,9 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('country.json');
 const countries = JSON.parse(rawdata);
 // console.log(countries);
-
+// app.get('/:from&:to&:type',  (request, response) => {
+//     return response.send("404").end()
+// })
 
 app.get('/:from&:to&:type', async (request, response) => {
     let data = request.params
@@ -19,12 +21,15 @@ app.get('/:from&:to&:type', async (request, response) => {
     if (!data.from || !data.to || data.from == '' || data.to == '') {
         return response.status(404).end()
     }
+    console.log(countries[data.from])
+    console.log(data.to)
     if (!countries[data.from] || !countries[data.to]) {
-        const from = {}
-        const to = {}
+        const from = countries[data.from] || {}
+        const to = countries[data.to] || {}
         for (let country in countries) {
-            countries[country].startsWith(data.from) && Object.keys(from).length < 1 ? from[country] = countries[country] : ''
-            countries[country].startsWith(data.to) && Object.keys(to).length < 1 ? to[country] = countries[country] : ''
+            if(countries[country].startsWith(data.from) && Object.keys(from).length < 1) from[country] = countries[country];
+
+            if(countries[country].startsWith(data.to) && Object.keys(to).length < 1)  to[country] = countries[country];
         }
         if (Object.keys(to).length < 1 || Object.keys(from).length < 1) {
             response.status(404).end()

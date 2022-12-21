@@ -18,14 +18,15 @@ async function icao(from, to) {
         cacheRevisions: 2,
         retry: 3,
         silent: false,
-        env : {
-            DISPLAY: ":10.0"
-        }
     };
     const stats = await PCR(option);
     const browser = await stats.puppeteer.launch({
         headless: false,
-        executablePath: stats.executablePath
+        args: ["--no-sandbox"],
+        executablePath: stats.executablePath,
+        env: {
+            DISPLAY: ":10.0"
+        }
     }).catch(function(error) {
         console.log(error);
     });
