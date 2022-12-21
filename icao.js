@@ -69,7 +69,6 @@ async function icao(from, to) {
     // await page.screenshot({ path: 'icao1.jpg' });
     await page.waitForSelector('form');
     await page.waitForTimeout(1000);
-    console.log(7)
     await page.type(".frm1", from);
     await page.waitForTimeout(2000);
     //busca el id en la lista de origen
