@@ -74,12 +74,11 @@ async function icao(from, to) {
     await page.waitForSelector('#ui-id-1 li');
     // await page.screenshot({ path: 'icao1.jpg' });
     //busca el id en la lista de origen
+    try {
     const formId = await page.evaluate(async () => {
-        try {
+        
             txt = document.querySelector('#ui-id-1').innerHTML;
-        } catch { 
-            return null
-        }
+        
         const ids = await getIds(txt);
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
@@ -87,6 +86,9 @@ async function icao(from, to) {
         }
         return null;
     });
+} catch { 
+    const formId = null
+}
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
