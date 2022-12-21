@@ -91,14 +91,18 @@ async function icao(from, to) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
 
         }
+        await con(12)
         return null;
-    });
+    }); 
+    console.log(13)
     if (formId == null) {
         console.log('origen no encontrado');
         await browser.close();
         return null;
     }
+    console.log(14)
     await page.click(formId);
+    console.log(15)
     await page.type(".to1", to);
     await page.waitForTimeout(1000);
     //busca el id em la lista de destinos
