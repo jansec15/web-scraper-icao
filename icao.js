@@ -89,7 +89,6 @@ async function icao(from, to) {
         }
         return null;
     });
-    return await page.screenshot()
     // return formId
     if (formId == null) {
         console.log('origen o id no encontrado');
