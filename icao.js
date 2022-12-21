@@ -76,7 +76,7 @@ async function icao(from, to) {
     //busca el id en la lista de origen
     let formId = null
     try {
-    let formId = await page.evaluate(async () => {
+    formId = await page.evaluate(async () => {
         
             txt = document.querySelector('#ui-id-1').innerHTML;
         
