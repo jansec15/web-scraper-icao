@@ -66,18 +66,27 @@ async function icao(from, to) {
         }
         return ids;
     });
+    await page.exposeFunction("con", function (i) {
+        console.log(i)
+    });
     console.log(4)
     await page.goto(baseurl);
     console.log(5)
     await page.waitForSelector('form');
+    console.log(6)
     await page.waitForTimeout(1000);
+    console.log(7)
     await page.type(".frm1", from);
+    console.log(8)
     await page.waitForTimeout(1000);
+    console.log(9)
     //busca el id en la lista de origen
     const formId = await page.evaluate(async () => {
-
+        
         txt = document.querySelector('#ui-id-1').innerHTML;
+        await con(10)
         const ids = await getIds(txt);
+        await con(11)
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
 
