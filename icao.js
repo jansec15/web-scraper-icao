@@ -145,5 +145,5 @@ async function icao(from, to) {
 module.exports = {
     "icao": icao
 }
-const result = icao("BOG", "MDE");
+// const result = icao("BOG", "MDE");
 
