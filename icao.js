@@ -24,9 +24,6 @@ async function icao(from, to) {
         headless: true,
         args: ["--no-sandbox",'--disable-setuid-sandbox','--use-gl=egl'],
         executablePath: stats.executablePath,
-        env: {
-            DISPLAY: "$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0"
-        }
     }).catch(function(error) {
         console.log(error);
     });
