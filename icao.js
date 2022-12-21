@@ -17,7 +17,10 @@ async function icao(from, to) {
         hosts: [],
         cacheRevisions: 2,
         retry: 3,
-        silent: false
+        silent: false,
+        env : {
+            DISPLAY: ":10.0"
+        }
     };
     const stats = await PCR(option);
     const browser = await stats.puppeteer.launch({
