@@ -1,7 +1,7 @@
 
 const baseurl = "https://applications.icao.int/icec";
 
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
 
 async function icao(from, to) {
     const start = new Date();
@@ -22,7 +22,7 @@ async function icao(from, to) {
     const stats = await PCR(option);
     const browser = await stats.puppeteer.launch({
         headless: true,
-        args: ["--no-sandbox",'--disable-setuid-sandbox','--use-gl=egl'],
+        args: ["--no-sandbox"],
         executablePath: stats.executablePath,
     }).catch(function(error) {
         console.log(error);
