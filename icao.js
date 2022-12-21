@@ -1,6 +1,5 @@
 
 const baseurl = "https://applications.icao.int/icec";
-// const baseurl = "https://www.icao.int/environmental-protection/Carbonoffset/Pages/default.aspx";
 // const puppeteer = require('puppeteer');
 
 async function icao(from, to) {
@@ -29,6 +28,7 @@ async function icao(from, to) {
         console.log(error);
     });
     // const browser = await puppeteer.launch({ headless: false });
+    // inicia el navegador
     const page = await browser.newPage();
     await page.exposeFunction("getFrom", function () {
         return '(' + from + ' ';
@@ -64,13 +64,15 @@ async function icao(from, to) {
         }
         return ids;
     });
+    //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
     await page.goto(baseurl);
     // await page.screenshot({ path: 'icao1.jpg' });
     await page.waitForSelector('form');
-    await page.waitForTimeout(1000);
+    // await page.waitForTimeout(1000);
     await page.type(".frm1", from);
-    await page.waitForTimeout(2000);
+    await page.waitForSelector('#ui-id-1 li');
+    await page.screenshot({ path: 'icao1.jpg' });
     //busca el id en la lista de origen
     const formId = await page.evaluate(async () => {
         try {
@@ -83,7 +85,6 @@ async function icao(from, to) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
 
         }
-        await con(12)
         return null;
     });
     if (formId == null) {
@@ -93,7 +94,8 @@ async function icao(from, to) {
     }
     await page.click(formId);
     await page.type(".to1", to);
-    await page.waitForTimeout(1000);
+    await page.waitForSelector('#ui-id-2 li');
+    // await page.waitForTimeout(1000);
     //busca el id em la lista de destinos
     const toId = await page.evaluate(async () => {
 
@@ -115,9 +117,8 @@ async function icao(from, to) {
         return null;
     }
     await page.click(toId);
-    await page.waitForTimeout(1000);
     await page.click('#computeByInput');
-    await page.waitForTimeout(1000);
+    await page.waitForSelector('#tableTotal');
     const tableTotal = await page.$eval("#tableTotal tbody tr", el => el.innerHTML);
 
     let result = tableTotal.replace(/<th>/g, '').split('</th>');
@@ -144,5 +145,5 @@ async function icao(from, to) {
 module.exports = {
     "icao": icao
 }
-// const result = icao("BOG", "MDE");
+const result = icao("BOG", "MDE");
 
