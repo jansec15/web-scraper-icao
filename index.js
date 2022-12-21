@@ -41,10 +41,9 @@ app.get('/:from&:to&:type', async (request, response) => {
         }
     }
     // return response.send(data).end()
-    console.log(data.from)
-    console.log(data.to)
+    // console.log(data.from)
+    // console.log(data.to)
     const result = await api.icao(data.from, data.to)
-    return response.json({'result':result}).end()
     // console.log(result)
     if (result == null) {
         // response.status(404).end()
