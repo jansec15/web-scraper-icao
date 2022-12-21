@@ -21,8 +21,6 @@ app.get('/:from&:to&:type', async (request, response) => {
     if (!data.from || !data.to || data.from == '' || data.to == '') {
         return response.status(404).end()
     }
-    console.log(countries[data.from])
-    console.log(data.to)
     if (!countries[data.from] || !countries[data.to]) {
         const from = countries[data.from] || {}
         const to = countries[data.to] || {}
