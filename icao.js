@@ -25,7 +25,7 @@ async function icao(from, to) {
         args: ["--no-sandbox",'--disable-setuid-sandbox','--use-gl=egl'],
         executablePath: stats.executablePath,
         env: {
-            DISPLAY: ":0"
+            DISPLAY: "10"
         }
     }).catch(function(error) {
         console.log(error);
