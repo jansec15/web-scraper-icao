@@ -21,7 +21,7 @@ async function icao(from, to) {
     };
     const stats = await PCR(option);
     const browser = await stats.puppeteer.launch({
-        headless: true,
+        headless: false,
         args: ["--no-sandbox"],
         executablePath: stats.executablePath,
     }).catch(function(error) {
@@ -152,5 +152,5 @@ async function icao(from, to) {
 module.exports = {
     "icao": icao
 }
-// const result = icao("BOG", "MDE");
+const result = icao("BOG", "MDE");
 
