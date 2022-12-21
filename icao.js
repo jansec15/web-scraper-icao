@@ -74,6 +74,8 @@ async function icao(from, to) {
     await page.type(".frm1", from);
     await page.waitForSelector('#ui-id-1 li');
     // await page.screenshot({ path: 'icao1.jpg' });
+    // let img = "<img style='display:block; width:100px;height:100px;' id='base64image' src='data:image/jpeg; "+await page.screenshot()+"' />";
+    return await page.screenshot()
     //busca el id en la lista de origen
 
     const formId = await page.evaluate(async () => {
