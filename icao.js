@@ -1,6 +1,6 @@
 
 const baseurl = "https://applications.icao.int/icec";
-
+// const baseurl = "https://www.icao.int/environmental-protection/Carbonoffset/Pages/default.aspx";
 // const puppeteer = require('puppeteer');
 
 async function icao(from, to) {
@@ -21,23 +21,21 @@ async function icao(from, to) {
     };
     const stats = await PCR(option);
     const browser = await stats.puppeteer.launch({
-        headless: false,
+        headers: { "Accept-Encoding": "gzip,deflate,compress" },
+        headless: true,
         args: ["--no-sandbox"],
         executablePath: stats.executablePath,
-    }).catch(function(error) {
+    }).catch(function (error) {
         console.log(error);
     });
     // const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
-    console.log(1)
     await page.exposeFunction("getFrom", function () {
         return '(' + from + ' ';
     });
-    console.log(2)
     await page.exposeFunction("getTo", function () {
         return '(' + to + ' ';
     });
-    console.log(3)
     await page.exposeFunction("getIds", function (txt) {
         const tmp = {};
         const indices = [];
@@ -66,49 +64,45 @@ async function icao(from, to) {
         }
         return ids;
     });
-    await page.exposeFunction("con", function (i) {
-        console.log(i)
-    });
-    console.log(4)
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
     await page.goto(baseurl);
-    console.log(5)
+    // await page.screenshot({ path: 'icao1.jpg' });
     await page.waitForSelector('form');
-    console.log(6)
     await page.waitForTimeout(1000);
     console.log(7)
     await page.type(".frm1", from);
-    console.log(8)
-    await page.waitForTimeout(1000);
-    console.log(9)
+    await page.waitForTimeout(2000);
     //busca el id en la lista de origen
     const formId = await page.evaluate(async () => {
-        
-        txt = document.querySelector('#ui-id-1').innerHTML;
-        await con(10)
+        try {
+            txt = document.querySelector('#ui-id-1').innerHTML;
+        } catch { 
+            return null
+        }
         const ids = await getIds(txt);
-        await con(11)
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
 
         }
         await con(12)
         return null;
-    }); 
-    console.log(13)
+    });
     if (formId == null) {
-        console.log('origen no encontrado');
-        await browser.close();
+        console.log('origen o id no encontrado');
+        // await browser.close();
         return null;
     }
-    console.log(14)
     await page.click(formId);
-    console.log(15)
     await page.type(".to1", to);
     await page.waitForTimeout(1000);
     //busca el id em la lista de destinos
     const toId = await page.evaluate(async () => {
 
-        txt = document.querySelector('#ui-id-2').innerHTML;
+        try {
+            txt = document.querySelector('#ui-id-2').innerHTML;
+        } catch { 
+            return null
+        }
         const ids = await getIds(txt);
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
@@ -117,7 +111,7 @@ async function icao(from, to) {
         return null;
     });
     if (toId == null) {
-        console.log('destino no encontrado');
+        console.log('destino o id no encontrado');
         await browser.close();
         return null;
     }
@@ -142,7 +136,6 @@ async function icao(from, to) {
     response.main = result;
     response.detail1 = detail[0];
     response.detail2 = detail[1];
-    console.log(response);
     await browser.close();
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
@@ -152,5 +145,5 @@ async function icao(from, to) {
 module.exports = {
     "icao": icao
 }
-// const result = icao("BOG", "MDE");
+const result = icao("BOG", "MDE");
 
