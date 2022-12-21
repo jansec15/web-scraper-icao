@@ -76,6 +76,7 @@ async function icao(from, to) {
     //busca el id en la lista de origen
 
     const formId = await page.evaluate(async () => {
+        return document
         txt = document.querySelector('#ui-id-1').innerHTML;
 
         const ids = await getIds(txt);
@@ -85,6 +86,7 @@ async function icao(from, to) {
         }
         return null;
     });
+    return formId
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
