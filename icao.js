@@ -96,7 +96,7 @@ async function icao(from, to) {
     await page.click(formId);
     await page.type(".to1", to);
     await page.waitForSelector('#ui-id-2 li');
-    await page.waitForTimeout(50);
+    await page.waitForTimeout(500);
     //busca el id em la lista de destinos
     const toId = await page.evaluate(async () => {
         txt = document.querySelector('#ui-id-2').innerHTML;
