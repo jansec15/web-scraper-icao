@@ -84,8 +84,10 @@ async function icao(from, to) {
 
         }
         return null;
+    }).catch(function (error) {
+        console.log(error);
+        return null
     });
-    return formId
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
@@ -97,18 +99,17 @@ async function icao(from, to) {
     // await page.waitForTimeout(1000);
     //busca el id em la lista de destinos
     const toId = await page.evaluate(async () => {
+        txt = document.querySelector('#ui-id-2').innerHTML;
 
-        try {
-            txt = document.querySelector('#ui-id-2').innerHTML;
-        } catch {
-            return null
-        }
         const ids = await getIds(txt);
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
 
         }
         return null;
+    }).catch(function (error) {
+        console.log(error);
+        return null
     });
     if (toId == null) {
         console.log('destino o id no encontrado');
