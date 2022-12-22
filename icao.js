@@ -87,7 +87,7 @@ async function icao(from, to) {
         console.log(error);
         return null
     });
-    return formId;
+    // return formId;
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
@@ -102,6 +102,7 @@ async function icao(from, to) {
         txt = document.querySelector('#ui-id-2').innerHTML;
 
         const ids = await getIds(txt);
+        return ids;
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
 
@@ -111,6 +112,7 @@ async function icao(from, to) {
         console.log(error);
         return null
     });
+    return toId;
     if (toId == null) {
         console.log('destino o id no encontrado');
         await browser.close();
