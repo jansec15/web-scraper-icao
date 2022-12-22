@@ -72,15 +72,10 @@ async function icao(from, to) {
     await page.waitForSelector('form');
     await page.type(".frm1", from);
     await page.waitForSelector('#ui-id-1 li');
-
-    await page.exposeFunction("screen", async function () {
-        return await page.$('#ui-id-1').innerHTML;
-    });
     //busca el id en la lista de origen
 
     const formId = await page.evaluate(async () => {
         // return document
-        return await screen();
         txt = document.querySelector('#ui-id-1').innerHTML;
 
         const ids = await getIds(txt);
