@@ -67,14 +67,12 @@ async function icao(from, to) {
     });
     //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
-    await page.setViewport({width:960,height:768});
     await page.goto(baseurl);
     // await page.screenshot({ path: 'icao1.jpg' });
     await page.waitForSelector('form');
     await page.type(".frm1", from);
     await page.waitForSelector('#ui-id-1 li');
-    // await page.screenshot({ path: 'icao1.jpg' });
-    // let img = "<img style='display:block; width:100px;height:100px;' id='base64image' src='data:image/jpeg; "+await page.screenshot()+"' />";
+    return await page.screenshot();
     
     //busca el id en la lista de origen
 
