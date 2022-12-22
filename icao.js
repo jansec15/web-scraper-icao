@@ -97,14 +97,13 @@ async function icao(from, to) {
     await page.click(formId);
     await page.type(".to1", to);
     await page.waitForSelector('#ui-id-2 li');
-    return await page.screenshot('icao1.jpg');
+    // return await page.screenshot();
     await page.waitForTimeout(1000);
     //busca el id em la lista de destinos
     const toId = await page.evaluate(async () => {
         txt = document.querySelector('#ui-id-2').innerHTML;
 
         const ids = await getIds(txt);
-        return ids;
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
 
@@ -114,7 +113,7 @@ async function icao(from, to) {
         console.log(error);
         return null
     });
-    return toId;
+    // return toId;
     if (toId == null) {
         console.log('destino o id no encontrado');
         await browser.close();
