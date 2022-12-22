@@ -79,15 +79,16 @@ async function icao(from, to) {
         txt = document.querySelector('#ui-id-1').innerHTML;
 
         const ids = await getIds(txt);
+        return ids;
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
-            console.log(document.querySelector('#ui-id-' + ids[x]).innerHTML)
         }
         return null;
     }).catch(function (error) {
         console.log(error);
         return null
     });
+    return formId;
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
