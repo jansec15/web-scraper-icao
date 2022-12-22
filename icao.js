@@ -81,7 +81,7 @@ async function icao(from, to) {
         const ids = await getIds(txt);
         for (x in ids) {
             if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
-
+            console.log(document.querySelector('#ui-id-' + ids[x]).innerHTML)
         }
         return null;
     }).catch(function (error) {
