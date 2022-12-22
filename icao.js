@@ -23,7 +23,7 @@ async function icao(from, to) {
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         headless: true,
-        args: ["--no-sandbox",'--disable-setuid-sandbox','--use-gl=egl'],
+        args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
         executablePath: stats.executablePath,
     }).catch(function (error) {
         console.log(error);
@@ -72,13 +72,15 @@ async function icao(from, to) {
     await page.waitForSelector('form');
     await page.type(".frm1", from);
     await page.waitForSelector('#ui-id-1 li');
-    const element = await page.$('#ui-id-1');
-    return await element.screenshot();
-    
+
+    await page.exposeFunction("screen", async function () {
+        return await page.$('#ui-id-1').innerHTML;
+    });
     //busca el id en la lista de origen
 
     const formId = await page.evaluate(async () => {
         // return document
+        return await screen();
         txt = document.querySelector('#ui-id-1').innerHTML;
 
         const ids = await getIds(txt);
@@ -88,7 +90,7 @@ async function icao(from, to) {
         }
         return null;
     });
-    // return formId
+    return formId
     if (formId == null) {
         console.log('origen o id no encontrado');
         // await browser.close();
@@ -147,5 +149,5 @@ async function icao(from, to) {
 module.exports = {
     "icao": icao
 }
-const result = icao("BOG", "MDE");
+// const result = icao("BOG", "MDE");
 
