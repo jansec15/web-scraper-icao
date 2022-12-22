@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
 async function icao(from, to) {
     const start = new Date();
     // const browser = await puppeteer.launch({
-    //     executablePath: '/usr/bin/chromium-browser'
+    //     // executablePath: '/usr/bin/chromium-browser'
     //   })
     const PCR = require("puppeteer-chromium-resolver");
     const option = {
