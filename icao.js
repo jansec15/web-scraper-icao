@@ -84,7 +84,7 @@ async function icao(from, to) {
         }
         return null;
     }).catch(function (error) {
-        console.log(error);
+        console.log("Error busqueda origen");
         return undefined
     });
     // return formId;
@@ -99,7 +99,7 @@ async function icao(from, to) {
             }
             return null;
         }).catch(function (error) {
-            console.log(error);
+            console.log("Error busqueda origen");
             return null
         });
     }
@@ -122,7 +122,7 @@ async function icao(from, to) {
         }
         return null;
     }).catch(function (error) {
-        console.log(error);
+        console.log('Error busqueda destino');
         return undefined
     });
     if (toId == undefined) {
@@ -137,12 +137,12 @@ async function icao(from, to) {
             }
             return null;
         }).catch(function (error) {
-            console.log(error);
+            console.log('Error busqueda destino');
             return null
         });
     }
     if (toId == null) {
-        console.log(' destino o id no encontrado');
+        console.log('destino o id no encontrado');
         await browser.close();
         return toId;
     }
