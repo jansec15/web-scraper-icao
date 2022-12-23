@@ -88,7 +88,7 @@ async function icao(from, to) {
         return undefined
     });
     // return formId;
-    if (formId == undefined) {
+    if (formId === undefined) {
         await page.waitForTimeout(1000)
         formId = await page.evaluate(async () => {
             // return document
@@ -103,7 +103,7 @@ async function icao(from, to) {
             return null
         });
     }
-    if (formId == null) {
+    if (formId === null) {
         console.log('origen o id no encontrado');
         await browser.close();
         return null;
@@ -125,7 +125,7 @@ async function icao(from, to) {
         console.log('Error busqueda destino ciclo 1');
         return undefined
     });
-    if (toId == undefined) {
+    if (toId === undefined) {
         await page.waitForTimeout(1000)
         toId = await page.evaluate(async () => {
             // return document
@@ -141,7 +141,7 @@ async function icao(from, to) {
             return null
         });
     }
-    if (toId == null) {
+    if (toId === null) {
         console.log('destino o id no encontrado');
         await browser.close();
         return null;
