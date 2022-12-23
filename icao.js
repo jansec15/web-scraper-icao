@@ -84,7 +84,7 @@ async function icao(from, to) {
         }
         return null;
     }).catch(function (error) {
-        console.log("Error busqueda origen");
+        console.log("Error busqueda origen  ciclo 1");
         return undefined
     });
     // return formId;
@@ -99,7 +99,7 @@ async function icao(from, to) {
             }
             return null;
         }).catch(function (error) {
-            console.log("Error busqueda origen");
+            console.log("Error busqueda origen ciclo 2");
             return null
         });
     }
@@ -122,7 +122,7 @@ async function icao(from, to) {
         }
         return null;
     }).catch(function (error) {
-        console.log('Error busqueda destino');
+        console.log('Error busqueda destino ciclo 1');
         return undefined
     });
     if (toId == undefined) {
@@ -137,14 +137,14 @@ async function icao(from, to) {
             }
             return null;
         }).catch(function (error) {
-            console.log('Error busqueda destino');
+            console.log('Error busqueda destino ciclo 2');
             return null
         });
     }
     if (toId == null) {
         console.log('destino o id no encontrado');
         await browser.close();
-        return toId;
+        return null;
     }
     await page.click(toId);
     await page.click('#computeByInput');
