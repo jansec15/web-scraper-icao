@@ -8,4 +8,4 @@ from -> origen<br/>
 to -> destino<br/>
 type -> 1 si es un vuelo de solo ida, cualquier otra cosa si es de ida y vuelta<br/>
 <br/>
-devuelve un json resultado : <valor>
+devuelve un json resultado : valor
