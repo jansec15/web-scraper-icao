@@ -141,7 +141,6 @@ async function icao(from, to) {
             return null
         });
     }
-    // return toId;
     if (toId == null) {
         console.log(' destino o id no encontrado');
         await browser.close();
