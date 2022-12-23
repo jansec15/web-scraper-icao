@@ -65,21 +65,6 @@ async function icao(from, to) {
         }
         return ids;
     });
-    await page.exposeFunction("eval", async function (id) {
-        await page.evaluate(async () => {
-            // return document
-            txt = document.querySelector('#ui-id-' + id).innerHTML;
-
-            const ids = await getIds(txt);
-            for (x in ids) {
-                if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
-            }
-            return null;
-        }).catch(function (error) {
-            console.log(error);
-            return null
-        })
-    });
     //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
     await page.goto(baseurl);
@@ -90,15 +75,37 @@ async function icao(from, to) {
 
     //busca el id en la lista de origen
 
-    const formId = eval(1);
+    let formId = await page.evaluate(async () => {
+        // return document
+        txt = document.querySelector('#ui-id-1').innerHTML;
+        const ids = await getIds(txt);
+        for (x in ids) {
+            if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
+        }
+        return null;
+    }).catch(function (error) {
+        console.log(error);
+        return undefined
+    });
     // return formId;
-    if (formId == null) {
+    if (formId == undefined) {
         await page.waitForTimeout(800)
-        formId = eval(1)
+        formId = await page.evaluate(async () => {
+            // return document
+            txt = document.querySelector('#ui-id-1').innerHTML;
+            const ids = await getIds(txt);
+            for (x in ids) {
+                if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
+            }
+            return null;
+        }).catch(function (error) {
+            console.log(error);
+            return null
+        });
     }
     if (formId == null) {
         console.log('origen o id no encontrado');
-        // await browser.close();
+        await browser.close();
         return null;
     }
     await page.click(formId);
@@ -106,17 +113,40 @@ async function icao(from, to) {
     await page.waitForSelector('#ui-id-2 li');
     // return await page.screenshot();
     //busca el id em la lista de destinos
-    const toId = eval(2);
-    // return toId;
-    if (toId == null) {
-        await page.waitForTimeout(800)
-        toId = eval(2)
+    let toId = await page.evaluate(async () => {
+        // return document
+        txt = document.querySelector('#ui-id-2').innerHTML;
+        const ids = await getIds(txt);
+        for (x in ids) {
+            if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
+        }
+        return null;
+    }).catch(function (error) {
+        console.log(error);
+        return undefined
+    });
+    if (toId == undefined) {
+        await page.waitForTimeout(1000)
+        toId = await page.evaluate(async () => {
+            // return document
+            txt = document.querySelector('#ui-id-2').innerHTML;
+            const ids = await getIds(txt);
+
+            for (x in ids) {
+                if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
+            }
+            return null;
+        }).catch(function (error) {
+            console.log(error);
+            return null
+        });
+        return toId;
     }
     // return toId;
     if (toId == null) {
-        console.log('destino o id no encontrado');
+        console.log(' destino o id no encontrado');
         await browser.close();
-        return null;
+        return toId;
     }
     await page.click(toId);
     await page.click('#computeByInput');
