@@ -89,7 +89,7 @@ async function icao(from, to) {
     });
     // return formId;
     if (formId == undefined) {
-        await page.waitForTimeout(800)
+        await page.waitForTimeout(1000)
         formId = await page.evaluate(async () => {
             // return document
             txt = document.querySelector('#ui-id-1').innerHTML;
