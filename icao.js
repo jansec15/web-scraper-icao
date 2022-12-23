@@ -140,7 +140,6 @@ async function icao(from, to) {
             console.log(error);
             return null
         });
-        return toId;
     }
     // return toId;
     if (toId == null) {
