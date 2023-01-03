@@ -21,25 +21,25 @@ app.get('/:from&:to&:type', async (request, response) => {
     if (!data.from || !data.to || data.from == '' || data.to == '') {
         return response.status(404).end()
     }
-    if (!countries[data.from] || !countries[data.to]) {
-        const from = countries[data.from] ? data.from : {}
-        const to = countries[data.to] ? data.to : {}
-        for (let country in countries) {
-            if (countries[country].includes(data.from) && Object.keys(from).length < 1) from[country] = countries[country];
+    // if (!countries[data.from] || !countries[data.to]) {
+    //     const from = countries[data.from] ? data.from : {}
+    //     const to = countries[data.to] ? data.to : {}
+    //     for (let country in countries) {
+    //         if (countries[country].includes(data.from) && Object.keys(from).length < 1) from[country] = countries[country];
 
-            if (countries[country].includes(data.to) && Object.keys(to).length < 1) to[country] = countries[country];
-        }
-        if (Object.keys(to).length < 1 || Object.keys(from).length < 1) {
-            response.status(404).end()
-            return null
-        } else {
-            // console.log(from)
-            // console.log(to)
-            Object.keys(from).length > 0 && !countries[data.from] ? data.from = Object.keys(from)[0] : ''
+    //         if (countries[country].includes(data.to) && Object.keys(to).length < 1) to[country] = countries[country];
+    //     }
+    //     if (Object.keys(to).length < 1 || Object.keys(from).length < 1) {
+    //         response.status(404).end()
+    //         return null
+    //     } else {
+    //         // console.log(from)
+    //         // console.log(to)
+    //         Object.keys(from).length > 0 && !countries[data.from] ? data.from = Object.keys(from)[0] : ''
 
-            Object.keys(to).length > 0 && !countries[data.to] ? data.to = Object.keys(to)[0] : ''
-        }
-    }
+    //         Object.keys(to).length > 0 && !countries[data.to] ? data.to = Object.keys(to)[0] : ''
+    //     }
+    // }
     // return response.send(data).end()
     // console.log(data.from)
     // console.log(data.to)
