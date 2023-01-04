@@ -59,7 +59,7 @@ def loadData():
         if (data[0] == ''):
             break
         if ((not data[1].__contains__('/')) and (not error)):
-            
+
             url = f"http://127.0.0.1:3030/{data[0]}&{data[1]}&{(0 if (data[2]=='ROUND TRIP') else 1)}"
             try:
                 resp = make_request(url)['result']
@@ -67,18 +67,21 @@ def loadData():
             except:
                 error = True
                 respuesta.append("")
-            print([data,resp])
+            print([data, resp])
         else:
             respuesta.append('')
-        count += 1
-        if (count > 15 and (not error)):
-            restante -=count
-            for i in range(1, 30):
-                print(f"esperando... {i}")
-                time.sleep(1)
-            progreso = (len(df.values)-restante)*100/len(df.values)
-            print(f"faltan por procesar {restante} - progreso %{progreso:.2f}")
-            count = 0
+        restante -= 1
+        progreso = (len(df.values)-restante)*100/len(df.values)
+        print(f"faltan por procesar {restante} - progreso %{progreso:.2f}")
+        # count += 1
+        # if (count > 15 and (not error)):
+        #     restante -=count
+        #     for i in range(1, 30):
+        #         print(f"esperando... {i}")
+        #         time.sleep(1)
+        #     progreso = (len(df.values)-restante)*100/len(df.values)
+        #     print(f"faltan por procesar {restante} - progreso %{progreso:.2f}")
+        #     count = 0
     # df = pd.DataFrame({'respuestas': respuesta})
     # dups = df.pivot_table(index=['respuestas'], aggfunc='size', )
     # print(dups)
@@ -87,7 +90,7 @@ def loadData():
     # dups.to_excel("result/"+output_name)
     df.to_excel(BASE_DIR+"result/"+output_name)
 
-    # os.startfile(BASE_DIR+"result")
+# os.startfile(BASE_DIR+"result")
 
 
 if __name__ == '__main__':

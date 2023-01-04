@@ -1,26 +1,25 @@
 const express = require('express');
 const app = express()
 var api = require('./icao');
+global.vars = require('./vars')
 const PORT = process.env.PORT || 3030;
 'use strict';
-
 const fs = require('fs');
-const cache = {}
-const rawdata = fs.readFileSync('country.json');
-const countries = JSON.parse(rawdata);
+// const rawdata = fs.readFileSync('country.json');
+// const countries = JSON.parse(rawdata);
 // console.log(countries);
 // app.get('/:from&:to&:type',  (request, response) => {
 //     return response.send("404").end()
 // })
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(s) {
+    return new Promise(resolve => setTimeout(resolve, (s * 1000)));
 }
 app.get('/:from&:to&:type', async (request, response) => {
-    let data = request.params
-    data.from = data.from.toUpperCase()
-    data.to = data.to.toUpperCase()
+    let data = request.params;
+    data.from = data.from.toUpperCase();
+    data.to = data.to.toUpperCase();
     if (!data.from || !data.to || data.from == '' || data.to == '') {
-        return response.status(404).end()
+        return response.status(404).end();
     }
     // if (!countries[data.from] || !countries[data.to]) {
     //     const from = countries[data.from] ? data.from : {}
@@ -45,18 +44,18 @@ app.get('/:from&:to&:type', async (request, response) => {
     // console.log(data.from)
     // console.log(data.to)
     let result = null
-    if (cache[`${data.from}` + "/" + `${data.to}`]) {
-        result = (data.type == '1') ? cache[`${data.from}` + "/" + `${data.to}`][1] : cache[`${data.from}` + "/" + `${data.to}`][0]
-        return response.json({ 'result': result }).end()
+    if (global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`] && (new Date() - global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`])>86300000) {
+        result = (data.type == '1') ? global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][1] : global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0]
+        return response.json({ 'result': result }).end();
     } else {
-        let condition = 0
-        while (condition < 60) {
+        let condition = 0;
+        while (condition < 300) {
             try {
-                result = await api.icao(data.from, data.to)
+                result = await api.icao(data.from, data.to);
                 break
             } catch (exeption) {
-                await sleep(10 * 1000)
-                condition += 10
+                await sleep(30);
+                condition += 30;
             }
         }
 
@@ -66,16 +65,21 @@ app.get('/:from&:to&:type', async (request, response) => {
     // console.log(result)
     if (result == null) {
         // response.status(404).end()
-        cache[`${data.from}` + "/" + `${data.to}`] = [null,null]
-        return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`] }).end()
+        global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
+        global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`] = [null, null];
+        console.log(global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0])
+        return response.json(resp).end({ 'result': global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0] });
     }
-    let main = result.main[result.main.length - 1]
-    let detail1 = result.detail1[result.detail1.length - 1]
-    cache[`${data.from}` + "/" + `${data.to}`] = [main, detail1]
+    let main = result.main[result.main.length - 1];
+    let detail1 = result.detail1[result.detail1.length - 1];
+    global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
+    global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`] = [main, detail1];
     if (data.type == '1') {
-        return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`][1] }).end()
+        console.log(global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][1])
+        return response.json({ 'result': global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][1] }).end();
     } else {
-        return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`][0] }).end()
+        console.log(global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0])
+        return response.json({ 'result': global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0] }).end();
     }
 })
 
