@@ -2,7 +2,6 @@ const express = require('express');
 const app = express()
 var api = require('./icao');
 const PORT = process.env.PORT || 3030;
-
 'use strict';
 
 const fs = require('fs');
@@ -13,7 +12,9 @@ const countries = JSON.parse(rawdata);
 // app.get('/:from&:to&:type',  (request, response) => {
 //     return response.send("404").end()
 // })
-
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 app.get('/:from&:to&:type', async (request, response) => {
     let data = request.params
     data.from = data.from.toUpperCase()
@@ -48,14 +49,24 @@ app.get('/:from&:to&:type', async (request, response) => {
         result = (data.type == '1') ? cache[`${data.from}` + "/" + `${data.to}`][1] : cache[`${data.from}` + "/" + `${data.to}`][0]
         return response.json({ 'result': result }).end()
     } else {
-        result = await api.icao(data.from, data.to)
+        let condition = 0
+        while (condition < 60) {
+            try {
+                result = await api.icao(data.from, data.to)
+                break
+            } catch (exeption) {
+                await sleep(10 * 1000)
+                condition += 10
+            }
+        }
+
     }
 
     // return response.send(result).end()
     // console.log(result)
     if (result == null) {
         // response.status(404).end()
-        cache[`${data.from}` + "/" + `${data.to}`] = null
+        cache[`${data.from}` + "/" + `${data.to}`] = [null,null]
         return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`] }).end()
     }
     let main = result.main[result.main.length - 1]
