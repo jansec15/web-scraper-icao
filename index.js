@@ -14,13 +14,13 @@ const fs = require('fs');
 function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, (s * 1000)));
 }
-app.get('/:from&:to&:type', async (request, response) => {
-    let data = request.params;
-    data.from = data.from.toUpperCase();
-    data.to = data.to.toUpperCase();
+app.get('/calcular', async (request, response) => {
+    let data = request.query;
     if (!data.from || !data.to || data.from == '' || data.to == '') {
         return response.status(404).end();
     }
+    data.from = data.from.toUpperCase();
+    data.to = data.to.toUpperCase();
     // if (!countries[data.from] || !countries[data.to]) {
     //     const from = countries[data.from] ? data.from : {}
     //     const to = countries[data.to] ? data.to : {}
