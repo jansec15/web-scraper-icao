@@ -77,7 +77,7 @@ def loadData():
                 print(f"esperando... {i}")
                 time.sleep(1)
             progreso = (len(df.values)-restante)*100/len(df.values)
-            print(f"faltan por procesar {restante} - progreso %{progreso}")
+            print(f"faltan por procesar {restante} - progreso %{progreso:.2f}")
             count = 0
     # df = pd.DataFrame({'respuestas': respuesta})
     # dups = df.pivot_table(index=['respuestas'], aggfunc='size', )
