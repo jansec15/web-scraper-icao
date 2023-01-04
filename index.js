@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3030;
 'use strict';
 
 const fs = require('fs');
-
+const cache = {}
 const rawdata = fs.readFileSync('country.json');
 const countries = JSON.parse(rawdata);
 // console.log(countries);
@@ -43,18 +43,28 @@ app.get('/:from&:to&:type', async (request, response) => {
     // return response.send(data).end()
     // console.log(data.from)
     // console.log(data.to)
-    const result = await api.icao(data.from, data.to)
+    let result = null
+    if (cache[`${data.from}` + "/" + `${data.to}`]) {
+        result = (data.type == '1') ? cache[`${data.from}` + "/" + `${data.to}`][1] : cache[`${data.from}` + "/" + `${data.to}`][0]
+        return response.json({ 'result': result }).end()
+    } else {
+        result = await api.icao(data.from, data.to)
+    }
+
     // return response.send(result).end()
     // console.log(result)
     if (result == null) {
         // response.status(404).end()
-        return response.json({ 'result': null }).end()
+        cache[`${data.from}` + "/" + `${data.to}`] = null
+        return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`] }).end()
     }
+    let main = result.main[result.main.length - 1]
+    let detail1 = result.detail1[result.detail1.length - 1]
+    cache[`${data.from}` + "/" + `${data.to}`] = [main, detail1]
     if (data.type == '1') {
-        return response.json({ 'result': result.detail1[result.detail1.length - 1] }).end()
-
+        return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`][1] }).end()
     } else {
-        return response.json({ 'result': result.main[result.main.length - 1] }).end()
+        return response.json({ 'result': cache[`${data.from}` + "/" + `${data.to}`][0] }).end()
     }
 })
 

@@ -53,11 +53,13 @@ def loadData():
     respuesta = []
     error = False
     count = 0
+    resp = ''
+    restante = len(df.values)
     for data in df.values:
         if (data[0] == ''):
             break
         if ((not data[1].__contains__('/')) and (not error)):
-            print(data)
+            
             url = f"http://127.0.0.1:3030/{data[0]}&{data[1]}&{(0 if (data[2]=='ROUND TRIP') else 1)}"
             try:
                 resp = make_request(url)['result']
@@ -65,15 +67,17 @@ def loadData():
             except:
                 error = True
                 respuesta.append("")
-            
+            print([data,resp])
         else:
             respuesta.append('')
         count += 1
-        if (count > 20 and (not error)):
+        if (count > 15 and (not error)):
+            restante -=count
             for i in range(1, 30):
                 print(f"esperando... {i}")
                 time.sleep(1)
-            print("continua")
+            progreso = (len(df.values)-restante)*100/len(df.values)
+            print(f"faltan por procesar {restante} - progreso %{progreso}")
             count = 0
     # df = pd.DataFrame({'respuestas': respuesta})
     # dups = df.pivot_table(index=['respuestas'], aggfunc='size', )
