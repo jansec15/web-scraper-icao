@@ -3,31 +3,39 @@ import requests
 import pandas as pd
 import json
 from requests.adapters import HTTPAdapter, Retry
+import time
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))+"/"
+
 
 def make_request(url):
-    
+
     session = requests.Session()
-    
+
     retry = Retry(connect=3, backoff_factor=0.5)
-    
+
     adapter = HTTPAdapter(max_retries=retry)
-    
+
     session.mount('http://', adapter)
-    
+
     response = session.get(url)
-    
+
     parsed = response.json()
 
     return parsed
 
+
 def loadData():
-    if not os.path.exists("data"):
-        raise Exception("Please create and put all your vidoes in assets folder!")
 
-    excel_list = os.listdir("data")
+    if not os.path.exists(BASE_DIR+"data"):
+        raise Exception(
+            "Please create and put all your vidoes in assets folder!")
 
-    if not os.path.exists("result"):
-        os.mkdir("result")
+    excel_list = os.listdir(BASE_DIR+"data")
+
+    if not os.path.exists(BASE_DIR+"result"):
+        os.mkdir(BASE_DIR+"result")
 
     for excel in excel_list:
         name, ext = os.path.splitext(excel)
@@ -36,41 +44,47 @@ def loadData():
 
         output_name = name + ".xlsx"
 
-    
-    
-    df = pd.read_excel("data/"+output_name)
-    #Display top 5 rows to check if everything looks good
+    df = pd.read_excel(BASE_DIR+"data/"+output_name)
+    # Display top 5 rows to check if everything looks good
     # df.insert(4, 'resultado', ["resultado"])
-    
-    print(df.head(5))
+
+    # print(df.head(5))
     # print(df)
     respuesta = []
-    cont = 0
+    error = False
+    count = 0
     for data in df.values:
-        if(data[0]==''):
+        if (data[0] == ''):
             break
-        if(not data[1].__contains__('/')):
+        if ((not data[1].__contains__('/')) and (not error)):
+            print(data)
             url = f"http://127.0.0.1:3030/{data[0]}&{data[1]}&{(0 if (data[2]=='ROUND TRIP') else 1)}"
-            respuesta.append(make_request(url)['result'])
+            try:
+                resp = make_request(url)['result']
+                respuesta.append(resp if resp != None else "")
+            except:
+                error = True
+                respuesta.append("")
+            
         else:
             respuesta.append('')
-
-       
+        count += 1
+        if (count > 20 and (not error)):
+            for i in range(1, 30):
+                print(f"esperando... {i}")
+                time.sleep(1)
+            print("continua")
+            count = 0
     # df = pd.DataFrame({'respuestas': respuesta})
     # dups = df.pivot_table(index=['respuestas'], aggfunc='size', )
     # print(dups)
     # dups.to_excel("result/"+output_name)
-    df.insert(1, 'resultado', respuesta)
-    print(df.head(5))
+    df.insert(3, 'resultado', respuesta)
     # dups.to_excel("result/"+output_name)
+    df.to_excel(BASE_DIR+"result/"+output_name)
 
-    # os.startfile("result")
+    # os.startfile(BASE_DIR+"result")
+
 
 if __name__ == '__main__':
     loadData()
-
-
-
-
-
-
