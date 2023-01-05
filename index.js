@@ -21,6 +21,9 @@ app.get('/calcular', async (request, response) => {
     }
     data.from = data.from.toUpperCase();
     data.to = data.to.toUpperCase();
+    if (!countries[data.from] || !countries[data.to]) {
+        return response.json(resp).end({ 'result': null });
+    }
     // if (!countries[data.from] || !countries[data.to]) {
     //     const from = countries[data.from] ? data.from : {}
     //     const to = countries[data.to] ? data.to : {}
