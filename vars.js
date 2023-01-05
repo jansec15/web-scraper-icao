@@ -1,10 +1,7 @@
-var vars = {
-    cache: {
-        icao: {
-            time_stamp: {},
-            flights: {}
-        }
-    }
+var cache = {
+    time_stamp: {},
+    flights: {}
 }
 
-module.exports = vars;
+
+module.exports = cache;

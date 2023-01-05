@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express()
 var api = require('./icao');
-global.vars = require('./vars')
+cache = require('./vars')
 const PORT = process.env.PORT || 3030;
 'use strict';
 const fs = require('fs');
@@ -44,8 +44,8 @@ app.get('/calcular', async (request, response) => {
     // console.log(data.from)
     // console.log(data.to)
     let result = null
-    if (global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`] && (new Date() - global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`])>86300000) {
-        result = (data.type == '1') ? global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][1] : global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0]
+    if (cache.flights[`${data.from}` + "/" + `${data.to}`] && (new Date() - cache.time_stamp[`${data.from}` + "/" + `${data.to}`])>86300000) {
+        result = (data.type == '1') ? cache.flights[`${data.from}` + "/" + `${data.to}`][1] : cache.flights[`${data.from}` + "/" + `${data.to}`][0]
         return response.json({ 'result': result }).end();
     } else {
         let condition = 0;
@@ -65,21 +65,21 @@ app.get('/calcular', async (request, response) => {
     // console.log(result)
     if (result == null) {
         // response.status(404).end()
-        global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
-        global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`] = [null, null];
-        console.log(global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0])
-        return response.json(resp).end({ 'result': global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0] });
+        cache.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
+        cache.flights[`${data.from}` + "/" + `${data.to}`] = [null, null];
+        console.log(cache.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ cache.flights[`${data.from}` + "/" + `${data.to}`][0])
+        return response.json(resp).end({ 'result': cache.flights[`${data.from}` + "/" + `${data.to}`][0] });
     }
     let main = result.main[result.main.length - 1];
     let detail1 = result.detail1[result.detail1.length - 1];
-    global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
-    global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`] = [main, detail1];
+    cache.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
+    cache.flights[`${data.from}` + "/" + `${data.to}`] = [main, detail1];
     if (data.type == '1') {
-        console.log(global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][1])
-        return response.json({ 'result': global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][1] }).end();
+        console.log(cache.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ cache.flights[`${data.from}` + "/" + `${data.to}`][1])
+        return response.json({ 'result': cache.flights[`${data.from}` + "/" + `${data.to}`][1] }).end();
     } else {
-        console.log(global.vars.cache.icao.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0])
-        return response.json({ 'result': global.vars.cache.icao.flights[`${data.from}` + "/" + `${data.to}`][0] }).end();
+        console.log(cache.time_stamp[`${data.from}` + "/" + `${data.to}`] +data.from+"/"+ data.to+" "+ cache.flights[`${data.from}` + "/" + `${data.to}`][0])
+        return response.json({ 'result': cache.flights[`${data.from}` + "/" + `${data.to}`][0] }).end();
     }
 })
 
