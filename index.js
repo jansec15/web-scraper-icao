@@ -5,8 +5,8 @@ cache = require('./vars')
 const PORT = process.env.PORT || 3030;
 'use strict';
 const fs = require('fs');
-// const rawdata = fs.readFileSync('country.json');
-// const countries = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('country.json');
+const countries = JSON.parse(rawdata);
 // console.log(countries);
 // app.get('/:from&:to&:type',  (request, response) => {
 //     return response.send("404").end()
