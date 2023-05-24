@@ -1,12 +1,9 @@
 
-const baseurl = "https://applications.icao.int/icec";
+const baseurl = "https://applications.icao.int/icec/Home/Index";
 const puppeteer = require('puppeteer');
 
 async function icao(from, to) {
     const start = new Date();
-    // const browser = await puppeteer.launch({
-    //     // executablePath: '/usr/bin/chromium-browser'
-    //   })
     const PCR = require("puppeteer-chromium-resolver");
     const option = {
         revision: "",
@@ -18,10 +15,13 @@ async function icao(from, to) {
         retry: 3,
         silent: false,
     };
+    //cargar opciones
     const stats = await PCR(option);
     process.env.PUPPETEER_EXECUTABLE_PATH = stats.executablePath;
+    //cargar el navegador en una variable
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
+        //false si quiere ver el navegador, true si no quiere mostrar el navegador
         headless: true,
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
         executablePath: stats.executablePath,
@@ -29,148 +29,92 @@ async function icao(from, to) {
         console.log(error);
     });
     // const browser = await puppeteer.launch({ headless: false });
+
     // inicia el navegador
     const page = await browser.newPage();
-    await page.exposeFunction("getFrom", function () {
-        return '(' + from + ' ';
-    });
-    await page.exposeFunction("getTo", function () {
-        return '(' + to + ' ';
-    });
-    await page.exposeFunction("getIds", function (txt) {
-        const tmp = {};
-        const indices = [];
-        let i = 0;
-        let addPost;
-        let num = '';
-        const ids = [];
-        let idx = txt.indexOf('ui-id-');
-        while (idx !== -1) {
-            indices.push(idx + 6);
-            idx = txt.indexOf('ui-id-', (idx + 1));
-        }
 
-        while (indices.length > i) {
-            if (addPost == undefined) addPost = indices[0];
-            if (isNaN(+txt[addPost])) {
-                ids.push(num);
-                i += 1;
-                addPost = indices[i];
-                num = '';
-            } else {
-                num += txt[addPost];
-                addPost += 1;
-            }
-            if (indices[i] == undefined) break;
-        }
-        return ids;
+    //funcion para enviar la variable from al navegador
+    await page.exposeFunction("getFrom", function () {
+        return from;
+    });
+    //funcion para enviar la variable to al navegador
+    await page.exposeFunction("getTo", function () {
+        return to;
     });
     //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
+    //crea una pestaña con la url
     await page.goto(baseurl);
-    // await page.screenshot({ path: 'icao1.jpg' });
+
+
     await page.waitForSelector('form');
-    await page.type(".frm1", from);
-    await page.waitForSelector('#ui-id-1 li');
 
-    //busca el id en la lista de origen
+    //ejecuta codigo en el navegador
+    await page.evaluate(async () => {
+        
+        //cargar variable from con la funcion getFrom()
+        var frm = await getFrom();
 
-    let formId = await page.evaluate(async () => {
-        // return document
-        txt = document.querySelector('#ui-id-1').innerHTML;
-        const ids = await getIds(txt);
-        for (x in ids) {
-            if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
-        }
-        return null;
+        //input de la pagina para origen de vuelo
+        document.querySelector('#frm1').value = frm
+
+        //funcion de la pagina icao que actualiza el input de destino
+        reduce(2);
+        GetAirport(frm, "#to1");
+
+        //cargar variable to con la funcion getTo()
+        var to = await getTo();
+        //actualiza inputs de la pagina
+        document.querySelector('#to1').value = to;
+        document.querySelector('#frm2').value = to;
+
     }).catch(function (error) {
-        console.log("Error busqueda origen  ciclo 1");
+        console.log(error);
         return undefined
     });
-    // return formId;
-    if (formId === undefined) {
-        await page.waitForTimeout(1000)
-        formId = await page.evaluate(async () => {
-            // return document
-            txt = document.querySelector('#ui-id-1').innerHTML;
-            const ids = await getIds(txt);
-            for (x in ids) {
-                if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getFrom())) return '#ui-id-' + ids[x];
-            }
-            return null;
-        }).catch(function (error) {
-            console.log("Error busqueda origen ciclo 2");
-            return null
-        });
-    }
-    if (formId === null) {
-        console.log('origen o id no encontrado');
-        await browser.close();
-        return null;
-    }
-    await page.click(formId);
-    await page.type(".to1", to);
-    await page.waitForSelector('#ui-id-2 li');
-    // return await page.screenshot();
-    //busca el id em la lista de destinos
-    let toId = await page.evaluate(async () => {
-        // return document
-        txt = document.querySelector('#ui-id-2').innerHTML;
-        const ids = await getIds(txt);
-        for (x in ids) {
-            if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
-        }
-        return null;
-    }).catch(function (error) {
-        console.log('Error busqueda destino ciclo 1');
-        return undefined
-    });
-    if (toId === undefined) {
-        await page.waitForTimeout(1000)
-        toId = await page.evaluate(async () => {
-            // return document
-            txt = document.querySelector('#ui-id-2').innerHTML;
-            const ids = await getIds(txt);
-
-            for (x in ids) {
-                if ((document.querySelector('#ui-id-' + ids[x]).innerHTML).includes(await getTo())) return '#ui-id-' + ids[x];
-            }
-            return null;
-        }).catch(function (error) {
-            console.log('Error busqueda destino ciclo 2');
-            return null
-        });
-    }
-    if (toId === null) {
-        console.log('destino o id no encontrado');
-        await browser.close();
-        return null;
-    }
-    await page.click(toId);
+    //envia el formulario
     await page.click('#computeByInput');
-    await page.waitForSelector('#tableTotal');
-    const tableTotal = await page.$eval("#tableTotal tbody tr", el => el.innerHTML);
 
-    let result = tableTotal.replace(/<th>/g, '').split('</th>');
-    result = result.map(x => x.replace(/\n/g, '').trim())
-    result = result.filter((item) => item !== '')
-    let tableDetail = await page.$eval("#tableDetail tbody", el => el.innerHTML);
-    let detail = tableDetail.replace(/<tr class="active">/g, '').split('</tr>');
+    //div que contiene los resultados
+    await page.waitForSelector('#h-Metric');
 
-    detail = detail.map((x) => x.replace(/\n/g, '').trim())
-    detail = detail.filter((item) => item !== '')
-    detail = detail.map((x) => x.replace(/<th>/g, '').split('</th>'))
-    detail = detail.map((x) => x.map(j => j.trim()))
-    detail = detail.map((item) => item.filter((item) => item !== ''))
-    let response = {}
-    response.main = result;
-    response.detail1 = detail[0];
-    response.detail2 = detail[1];
+    //codigo para extraer respuesta del navegador
+    const result = await page.evaluate(async () => {
+        var table = document.querySelectorAll('div#h-Metric .body-content tr th div');
+        var result = [];
+        for (var i = 0; i < table.length; i++) {
+            let element = table[i].querySelectorAll('label');
+            let key = element[0].innerHTML
+            let value = element[1].innerHTML;
+            result.push([key, value])
+
+        }
+        return result;
+    });
+
+    //cierra el navegador
     await browser.close();
+    
+    //si por alguna razon tiene menos de 6 de longitud es que sucedio algo
+    if (result.length < 6) {
+        return undefined
+    }
+    let response = {};
+    //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
+    if (!result[3][0].includes('Passenger CO')) {
+        return undefined
+    }
+
+    if (!result[5][0].includes('Passenger CO')) {
+        return undefined  
+    }
+    
+    response.main = parseInt(result[3][1]) + parseInt(result[5][1]);
+    response.detail1 = result[3][1];
+    response.detail2 = result[5][1];
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
-
 }
 module.exports = {
     "icao": icao
