@@ -46,34 +46,48 @@ async function icao(from, to) {
     //crea una pestaña con la url
     await page.goto(baseurl);
 
-
     await page.waitForSelector('form');
 
     //ejecuta codigo en el navegador
     await page.evaluate(async () => {
-        
+        var opt = "#passenger_";
         //cargar variable from con la funcion getFrom()
         var frm = await getFrom();
 
         //input de la pagina para origen de vuelo
-        document.querySelector('#frm1').value = frm
+        $(opt + "frm1").val(frm)
 
         //funcion de la pagina icao que actualiza el input de destino
         reduce(2);
-        GetAirport(frm, "#to1");
+        GetAirport(frm, opt + "to1", '#passenger');
 
         //cargar variable to con la funcion getTo()
         var to = await getTo();
         //actualiza inputs de la pagina
-        document.querySelector('#to1').value = to;
-        document.querySelector('#frm2').value = to;
-
-    }).catch(function (error) {
+        $(opt + "to1").val(to);
+        $(opt + "frm3").val(frm);
+    }).catch(error => {
         console.log(error);
-        return undefined
+        return undefined;
     });
+    
     //envia el formulario
-    await page.click('#computeByInput');
+    try {
+        await Promise.race([
+            page.click('#computeByInput'),
+            new Promise((_, reject) => {
+                setTimeout(() => {
+                    console.log("Límite de tiempo excedido")
+                    reject(new Error('Límite de tiempo excedido'));
+                }, 2000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
+            })
+        ]);
+    } catch (error) {
+        console.log(error);
+        return undefined;
+    }
+
+    // await page.click('#computeByInput');
 
     //div que contiene los resultados
     await page.waitForSelector('#h-Metric');
@@ -94,21 +108,21 @@ async function icao(from, to) {
 
     //cierra el navegador
     await browser.close();
-    
+
     //si por alguna razon tiene menos de 6 de longitud es que sucedio algo
     if (result.length < 6) {
         return undefined
     }
-    let response = {};
+
     //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
     if (!result[3][0].includes('Passenger CO')) {
         return undefined
     }
 
     if (!result[5][0].includes('Passenger CO')) {
-        return undefined  
+        return undefined
     }
-    
+    let response = {};
     response.main = parseInt(result[3][1]) + parseInt(result[5][1]);
     response.detail1 = result[3][1];
     response.detail2 = result[5][1];

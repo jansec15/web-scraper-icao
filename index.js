@@ -108,7 +108,10 @@ app.get('/calcular', async (request, response) => {
     }
     data.from = data.from.toUpperCase();
     data.to = data.to.toUpperCase();
-    console.log(data.from + ' ' +data.to);
+    // if(data.from === data.to){
+    //     return response.json({ 'result': 0}).end();
+    // }
+    // console.log(data.from + ' ' +data.to);
 
     // result = await api.icao(data.from, data.to);
 
