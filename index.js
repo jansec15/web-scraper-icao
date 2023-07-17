@@ -119,7 +119,9 @@ app.get('/calcular', async (request, response) => {
         return response.json({ 'result': null }).end();
     }
     let result = null
-    if (cache.flights[`${data.from}` + "/" + `${data.to}`] && (new Date() - cache.time_stamp[`${data.from}` + "/" + `${data.to}`]) > 86300000) {
+    var dia = 86300000 //24 horas en milisegundos
+    var semana = dia*7
+    if (cache.flights[`${data.from}` + "/" + `${data.to}`] && (new Date() - cache.time_stamp[`${data.from}` + "/" + `${data.to}`]) > semana) {
         result = (data.type == '1') ? cache.flights[`${data.from}` + "/" + `${data.to}`][1] : cache.flights[`${data.from}` + "/" + `${data.to}`][0]
         return response.json({ 'result': result }).end();
     } else {
