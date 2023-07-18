@@ -139,10 +139,7 @@ app.get('/calcular', async (request, response) => {
     }
 
     if (result == null) {
-        cache.time_stamp[`${data.from}` + "/" + `${data.to}`] = new Date();
-        cache.flights[`${data.from}` + "/" + `${data.to}`] = [null, null];
-        console.log(cache.time_stamp[`${data.from}` + "/" + `${data.to}`] + data.from + "/" + data.to + " " + cache.flights[`${data.from}` + "/" + `${data.to}`][0])
-        return response.json({ 'result': cache.flights[`${data.from}` + "/" + `${data.to}`][0] }).end();
+        return response.json({ 'result': null }).end();
     }
     let main = result.main;
     let detail1 = result.detail1;
