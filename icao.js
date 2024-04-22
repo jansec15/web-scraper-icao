@@ -75,12 +75,12 @@ async function icao(from, to) {
     try {
         await Promise.race([
             page.click('#computeByInput'),
-            new Promise((_, reject) => {
-                setTimeout(() => {
-                    console.log("Límite de tiempo excedido")
-                    reject(new Error('Límite de tiempo excedido'));
-                }, 2000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
-            })
+            // new Promise((_, reject) => {
+            //     setTimeout(() => {
+            //         console.log("Límite de tiempo excedido")
+            //         reject(new Error('Límite de tiempo excedido'));
+            //     }, 3000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
+            // })
         ]);
     } catch (error) {
         console.log(error);
@@ -107,7 +107,7 @@ async function icao(from, to) {
     });
 
     //cierra el navegador
-    await browser.close();
+    // await browser.close();
 
     //si por alguna razon tiene menos de 6 de longitud es que sucedio algo
     if (result.length < 6) {
@@ -130,6 +130,7 @@ async function icao(from, to) {
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
 }
+
 module.exports = {
     "icao": icao
 }
