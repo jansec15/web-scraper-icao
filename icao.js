@@ -75,12 +75,12 @@ async function icao(from, to) {
     try {
         await Promise.race([
             page.click('#computeByInput'),
-            // new Promise((_, reject) => {
-            //     setTimeout(() => {
-            //         console.log("Límite de tiempo excedido")
-            //         reject(new Error('Límite de tiempo excedido'));
-            //     }, 3000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
-            // })
+            new Promise((_, reject) => {
+                setTimeout(() => {
+                    console.log("Límite de tiempo excedido")
+                    reject(new Error('Límite de tiempo excedido'));
+                }, 3000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
+            })
         ]);
     } catch (error) {
         console.log(error);
