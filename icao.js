@@ -91,22 +91,21 @@ async function icao(from, to) {
     // await page.click('#computeByInput');
 
     //div que contiene los resultados
-    await page.waitForSelector('#h-Metric');
+    await page.waitForSelector('div#h-Metric .body-content tr td div');
 
     //codigo para extraer respuesta del navegador
     const result = await page.evaluate(async () => {
-        var table = document.querySelectorAll('div#h-Metric .body-content tr th div');
+        var table = document.querySelectorAll('div#h-Metric .body-content tr td div');
         var result = [];
+        
         for (var i = 0; i < table.length; i++) {
             let element = table[i].querySelectorAll('label');
             let key = element[0].innerHTML
             let value = element[1].innerHTML;
-            result.push([key, value])
-
+            result.push([key, value]);
         }
         return result;
     });
-
     //cierra el navegador
     // await browser.close();
 
@@ -116,17 +115,17 @@ async function icao(from, to) {
     }
 
     //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
-    if (!result[3][0].includes('Passenger CO')) {
-        return undefined
-    }
-
     if (!result[5][0].includes('Passenger CO')) {
         return undefined
     }
+
+    if (!result[8][0].includes('Passenger CO')) {
+        return undefined
+    }
     let response = {};
-    response.main = parseInt(result[3][1]) + parseInt(result[5][1]);
-    response.detail1 = result[3][1];
-    response.detail2 = result[5][1];
+    response.main = parseInt(result[5][1]) + parseInt(result[8][1]);
+    response.detail1 = result[5][1];
+    response.detail2 = result[8][1];
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
