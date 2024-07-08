@@ -55,17 +55,18 @@ async function icao(from, to) {
         var frm = await getFrom();
 
         //input de la pagina para origen de vuelo
-        $(opt + "frm1").val(frm)
-
+        $(opt + "frm1").val(frm);
+        $(opt + "to1").empty();
         //funcion de la pagina icao que actualiza el input de destino
-        reduce(2);
-        GetAirport(frm, opt + "to1", '#passenger');
-
+        Reduce("second");
+        GetAirport(frm, opt + "to1", 'passenger');
+        $(opt + "to1").val('0');
         //cargar variable to con la funcion getTo()
         var to = await getTo();
         //actualiza inputs de la pagina
         $(opt + "to1").val(to);
-        $(opt + "frm3").val(frm);
+        Reduce("second");
+        // $(opt + "frm3").val(frm);
     }).catch(error => {
         console.log(error);
         return undefined;
