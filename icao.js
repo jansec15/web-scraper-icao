@@ -71,7 +71,7 @@ async function icao(from, to) {
         console.log(error);
         return undefined;
     });
-    
+
     //envia el formulario
     try {
         await Promise.race([
@@ -97,7 +97,7 @@ async function icao(from, to) {
     const result = await page.evaluate(async () => {
         var table = document.querySelectorAll('div#h-Metric .body-content tr td div');
         var result = [];
-        
+
         for (var i = 0; i < table.length; i++) {
             let element = table[i].querySelectorAll('label');
             let key = element[0].innerHTML
@@ -123,9 +123,9 @@ async function icao(from, to) {
         return undefined
     }
     let response = {};
-    response.main = parseInt(result[5][1]) + parseInt(result[8][1]);
-    response.detail1 = result[5][1];
-    response.detail2 = result[8][1];
+    response.main = parseInt(result[5][1].replace(/\D+/g, "")) + parseInt(result[8][1].replace(/\D+/g, ""));
+    response.detail1 = result[5][1].replace(/\D+/g, "");
+    response.detail2 = result[8][1].replace(/\D+/g, "");
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
