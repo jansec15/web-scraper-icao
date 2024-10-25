@@ -124,8 +124,8 @@ async function icao(from, to) {
     }
     let response = {};
     response.main = parseInt(result[5][1].replace(/\D+/g, "")) + parseInt(result[8][1].replace(/\D+/g, ""));
-    response.detail1 = result[5][1].replace(/\D+/g, "");
-    response.detail2 = result[8][1].replace(/\D+/g, "");
+    response.detail1 = parseInt(result[5][1].replace(/\D+/g, ""));
+    response.detail2 = parseInt(result[8][1].replace(/\D+/g, ""));
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
