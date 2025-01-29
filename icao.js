@@ -17,22 +17,24 @@ async function icao(from, to) {
     };
     //cargar opciones
     const stats = await PCR(option);
+    
     process.env.PUPPETEER_EXECUTABLE_PATH = stats.executablePath;
+    
     //cargar el navegador en una variable
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         //false si quiere ver el navegador, true si no quiere mostrar el navegador
         headless: true,
+        // executablePath: stats.executablePath,
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
-        executablePath: stats.executablePath,
     }).catch(function (error) {
         console.log(error);
     });
     // const browser = await puppeteer.launch({ headless: false });
-
+    
     // inicia el navegador
     const page = await browser.newPage();
-
+    
     //funcion para enviar la variable from al navegador
     await page.exposeFunction("getFrom", function () {
         return from;
@@ -43,9 +45,10 @@ async function icao(from, to) {
     });
     //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
+    
     //crea una pestaña con la url
     await page.goto(baseurl);
-
+    
     await page.waitForSelector('form');
 
     //ejecuta codigo en el navegador
