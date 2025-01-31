@@ -1,31 +1,34 @@
-
-const baseurl = "https://applications.icao.int/icec/Home/Index";
-const puppeteer = require('puppeteer');
+// async function loadChromium(){
+//     const PCR = require("puppeteer-chromium-resolver");
+//     const option = {
+//         revision: "",
+//         detectionPath: "",
+//         folderName: ".chromium-browser-snapshots",
+//         defaultHosts: ["https://storage.googleapis.com", "https://npm.taobao.org/mirrors"],
+//         hosts: [],
+//         cacheRevisions: 2,
+//         retry: 3,
+//         silent: false,
+//     };
+//     //cargar opciones
+//     const stats = await PCR(option);
+    
+//     process.env['PUPPETEER_EXECUTABLE_PATH'] = stats.executablePath;
+//     console.log(process.env.PUPPETEER_EXECUTABLE_PATH)
+// }
+// loadChromium()
 
 async function icao(from, to) {
     const start = new Date();
-    const PCR = require("puppeteer-chromium-resolver");
-    const option = {
-        revision: "",
-        detectionPath: "",
-        folderName: ".chromium-browser-snapshots",
-        defaultHosts: ["https://storage.googleapis.com", "https://npm.taobao.org/mirrors"],
-        hosts: [],
-        cacheRevisions: 2,
-        retry: 3,
-        silent: false,
-    };
-    //cargar opciones
-    const stats = await PCR(option);
-    
-    process.env.PUPPETEER_EXECUTABLE_PATH = stats.executablePath;
+    const baseurl = "https://applications.icao.int/icec/Home/Index";
+    const puppeteer = require('puppeteer');
     
     //cargar el navegador en una variable
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         //false si quiere ver el navegador, true si no quiere mostrar el navegador
         headless: true,
-        executablePath: stats.executablePath,
+        // executablePath: stats.executablePath,
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
     }).catch(function (error) {
         console.log(error);
@@ -90,8 +93,6 @@ async function icao(from, to) {
         console.log(error);
         return undefined;
     }
-
-    // await page.click('#computeByInput');
 
     //div que contiene los resultados
     await page.waitForSelector('div#h-Metric .body-content tr td div');
