@@ -25,7 +25,7 @@ async function icao(from, to) {
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         //false si quiere ver el navegador, true si no quiere mostrar el navegador
         headless: true,
-        // executablePath: stats.executablePath,
+        executablePath: stats.executablePath,
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
     }).catch(function (error) {
         console.log(error);
@@ -110,7 +110,7 @@ async function icao(from, to) {
         return result;
     });
     //cierra el navegador
-    // await browser.close();
+    await browser.close();
 
     //si por alguna razon tiene menos de 6 de longitud es que sucedio algo
     if (result.length < 6) {
