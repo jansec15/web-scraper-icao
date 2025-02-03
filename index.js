@@ -76,7 +76,7 @@ app.get('/calcular', async (request, response) => {
     }
     let result = null
     var dia = 86300000 //24 horas en milisegundos
-    var semana = dia * 7
+    var semana = dia * 180
     if (cache.flights[`${data.from}/${data.to}`] && (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= semana) {
         result = (data.type == '1') ? cache.flights[`${data.from}/${data.to}`][1] : cache.flights[`${data.from}/${data.to}`][0]
         // console.log(`ruta: ${data.from}/${data.to} valor: ${result}`);

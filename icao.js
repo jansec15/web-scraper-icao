@@ -91,6 +91,7 @@ async function icao(from, to) {
         ]);
     } catch (error) {
         console.log(error);
+        await browser.close();
         return undefined;
     }
 
