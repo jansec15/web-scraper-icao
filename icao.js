@@ -120,17 +120,17 @@ async function icao(from, to) {
     }
 
     //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
-    if (!result[5][0].includes('Passenger CO')) {
+    if (!result[4][0].includes('Passenger CO')) {
         return undefined
     }
 
-    if (!result[8][0].includes('Passenger CO')) {
+    if (!result[7][0].includes('Passenger CO')) {
         return undefined
     }
     let response = {};
-    response.main = parseInt(result[5][1].replace(/\D+/g, "")) + parseInt(result[8][1].replace(/\D+/g, ""));
-    response.detail1 = parseInt(result[5][1].replace(/\D+/g, ""));
-    response.detail2 = parseInt(result[8][1].replace(/\D+/g, ""));
+    response.main = parseInt(result[4][1].replace(/\D+/g, "")) + parseInt(result[7][1].replace(/\D+/g, ""));
+    response.detail1 = parseInt(result[4][1].replace(/\D+/g, ""));
+    response.detail2 = parseInt(result[7][1].replace(/\D+/g, ""));
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
