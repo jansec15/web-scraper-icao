@@ -33,14 +33,15 @@ async function saveData() {
             if (err) console.log(err);
             else {
                 console.log("flights written tmp successfully\n");
+                fs.rename('flights.json.tmp', 'flights.json',(err) => {
+                    if (err) console.log(err);
+                    else {
+                        console.log("flights save successfully\n");
+                    }
+                });
             }
         });
-        await fs.rename('flights.json.tmp', 'flights.json',(err) => {
-            if (err) console.log(err);
-            else {
-                console.log("flights save successfully\n");
-            }
-        }); // Operación atómica
+          // Operación atómica
     } catch (error) {
         console.error('Error guardando datos:', error);
     } finally {
@@ -63,6 +64,7 @@ function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, (s * 1000)));
 }
 app.get('/calcular', async (request, response) => {
+    if(!cache) await loadInitialData();
     let data = request.query;
 
     if (!data.from || !data.to || data.from == '' || data.to == '') {
@@ -79,10 +81,12 @@ app.get('/calcular', async (request, response) => {
     var limit = dia * 180
     cache_flight = cache.flights[`${data.from}/${data.to}`]
     is_null = cache_flight && cache.flights[`${data.from}/${data.to}`][0] == null
-    is_limit_null = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= 300000
+    is_limit_null = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= 3600000
     is_limit = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= limit
     if (cache_flight && ((is_null && is_limit_null) || (!is_null && is_limit))) {
+        
         result = (data.type == '1') ? cache.flights[`${data.from}/${data.to}`][1] : cache.flights[`${data.from}/${data.to}`][0]
+        console.log(`${data.from}/${data.to} ${result}`)
         // console.log(`ruta: ${data.from}/${data.to} valor: ${result}`);
         return response.json({ 'result': result }).end();
     } else {
@@ -102,6 +106,7 @@ app.get('/calcular', async (request, response) => {
     if (result == null) {
         cache.time_stamp[`${data.from}/${data.to}`] = new Date();
         cache.flights[`${data.from}/${data.to}`] = [null, null];
+        console.log(`${data.from}/${data.to} fail`)
         return response.json({ 'result': null }).end();
     }
     let main = result.main;
