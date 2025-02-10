@@ -1,24 +1,42 @@
-async function loadChromium(){
+async function loadChromium() {
     const PCR = require("puppeteer-chromium-resolver");
     const option = {
-        revision: "",
-        detectionPath: "",
-        folderName: ".chromium-browser-snapshots",
+        revision: "", // Deja esto vacío para que PCR busque la mejor revisión
+        detectionPath: "", // Deja esto vacío para que PCR busque la mejor ruta
+        folderName: ".chromium-browser-snapshots", // Directorio para snapshots
         defaultHosts: ["https://storage.googleapis.com", "https://npm.taobao.org/mirrors"],
         hosts: [],
         cacheRevisions: 2,
         retry: 3,
         silent: false,
     };
-    //cargar opciones
-    const stats = await PCR(option);
-    
-    process.env['PUPPETEER_EXECUTABLE_PATH'] = stats.executablePath;
-    console.log(process.env.PUPPETEER_EXECUTABLE_PATH)
-}
-loadChromium()
 
+    try {
+        const stats = await PCR(option);
+        process.env['PUPPETEER_EXECUTABLE_PATH'] = stats.executablePath;
+        console.log("Ruta de Chromium:", process.env.PUPPETEER_EXECUTABLE_PATH);
+        return stats.executablePath; // Devuelve la ruta para usarla directamente
+    } catch (error) {
+        console.error("Error al cargar Chromium:", error);
+        // Aquí puedes manejar el error de forma más específica:
+        if (error.message.includes('No revision found')) {
+            console.error("No se encontró una revisión compatible de Chromium. Asegúrate de tener conexión a internet para la primera ejecución.");
+          // Aquí puedes ofrecer instrucciones al usuario o tomar una acción alternativa.
+        } else if (error.message.includes("Couldn't find expected browser")) {
+          console.error("No se pudo encontrar el navegador. Asegúrate de que el directorio '.chromium-browser-snapshots' tenga los permisos correctos.");
+        }
+        else {
+          console.error("Error desconocido al cargar Chromium");
+        }
+        return null; // Indica que no se pudo cargar Chromium
+    }
+}
 async function icao(from, to) {
+    const executablePath = await loadChromium();
+    if(!executablePath){
+        console.error("No se pudo iniciar Puppeteer porque no se encontró Chromium.");
+        return null;
+    }
     const start = new Date();
     const baseurl = "https://applications.icao.int/icec/Home/Index";
     const puppeteer = require('puppeteer');
@@ -116,16 +134,16 @@ async function icao(from, to) {
 
     //si por alguna razon tiene menos de 6 de longitud es que sucedio algo
     if (result.length < 6) {
-        return undefined
+        return undefined;
     }
 
     //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
     if (!result[4][0].includes('Passenger CO')) {
-        return undefined
+        return undefined;
     }
 
     if (!result[7][0].includes('Passenger CO')) {
-        return undefined
+        return undefined;
     }
     let response = {};
     response.main = parseInt(result[4][1].replace(/\D+/g, "")) + parseInt(result[7][1].replace(/\D+/g, ""));
@@ -139,5 +157,5 @@ async function icao(from, to) {
 module.exports = {
     "icao": icao
 }
-// const result = icao("BOG", "MDE");
+const result = icao("BOG", "MDE");
 
