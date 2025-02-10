@@ -15,9 +15,9 @@ let timeoutId = null;
 const mutex = new Mutex(); // Para evitar escrituras concurrentes
 let pendingWrites = 0; // Contador de escrituras pendientes
 
-async function loadInitialData() {
+function loadInitialData() {
     try {
-        const rawData = await fs.readFileSync('flights.json', 'utf8');
+        const rawData = fs.readFileSync('flights.json', 'utf8');
         cache = JSON.parse(rawData);
         console.log('Datos cargados desde flights.json');
     } catch (error) {
@@ -29,7 +29,7 @@ async function loadInitialData() {
 async function saveData() {
     const release = await mutex.acquire();
     try {
-        await fs.writeFile('flights.json.tmp', JSON.stringify(cache),(err) => {
+         fs.writeFile('flights.json.tmp', JSON.stringify(cache),(err) => {
             if (err) console.log(err);
             else {
                 console.log("flights written tmp successfully\n");
@@ -51,7 +51,7 @@ async function saveData() {
 }
 // Middleware para gestionar la carga y descarga de datos
 app.use(async (req, res, next) => {
-    if (!cache) await loadInitialData();
+    if (!cache) loadInitialData();
     // Reiniciar temporizador de inactividad
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(saveData, 60000); // 1 minuto de inactividad
@@ -64,7 +64,7 @@ function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, (s * 1000)));
 }
 app.get('/calcular', async (request, response) => {
-    if(!cache) await loadInitialData();
+    if(!cache) loadInitialData();
     let data = request.query;
 
     if (!data.from || !data.to || data.from == '' || data.to == '') {
