@@ -21,26 +21,26 @@ async function loadChromium() {
         // Aquí puedes manejar el error de forma más específica:
         if (error.message.includes('No revision found')) {
             console.error("No se encontró una revisión compatible de Chromium. Asegúrate de tener conexión a internet para la primera ejecución.");
-          // Aquí puedes ofrecer instrucciones al usuario o tomar una acción alternativa.
+            // Aquí puedes ofrecer instrucciones al usuario o tomar una acción alternativa.
         } else if (error.message.includes("Couldn't find expected browser")) {
-          console.error("No se pudo encontrar el navegador. Asegúrate de que el directorio '.chromium-browser-snapshots' tenga los permisos correctos.");
+            console.error("No se pudo encontrar el navegador. Asegúrate de que el directorio '.chromium-browser-snapshots' tenga los permisos correctos.");
         }
         else {
-          console.error("Error desconocido al cargar Chromium");
+            console.error("Error desconocido al cargar Chromium");
         }
         return null; // Indica que no se pudo cargar Chromium
     }
 }
 async function icao(from, to) {
     const executablePath = await loadChromium();
-    if(!executablePath){
+    if (!executablePath) {
         console.error("No se pudo iniciar Puppeteer porque no se encontró Chromium.");
         return null;
     }
     const start = new Date();
     const baseurl = "https://applications.icao.int/icec/Home/Index";
     const puppeteer = require('puppeteer');
-    
+
     //cargar el navegador en una variable
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
@@ -52,10 +52,10 @@ async function icao(from, to) {
         console.log(error);
     });
     // const browser = await puppeteer.launch({ headless: false });
-    
+
     // inicia el navegador
     const page = await browser.newPage();
-    
+
     //funcion para enviar la variable from al navegador
     await page.exposeFunction("getFrom", function () {
         return from;
@@ -66,29 +66,30 @@ async function icao(from, to) {
     });
     //permite la cargar correctamente la pagina
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
-    
+
     //crea una pestaña con la url
     await page.goto(baseurl);
-    
-    await page.waitForSelector('form');
+
+    await page.waitForSelector('.mainContent');
 
     //ejecuta codigo en el navegador
     await page.evaluate(async () => {
-        var opt = "#passenger_";
+        var opt1 = "#selectPassengerDeparture";
+        var opt2 = "#selectPassengerDestination1";
         //cargar variable from con la funcion getFrom()
         var frm = await getFrom();
 
         //input de la pagina para origen de vuelo
-        $(opt + "frm1").val(frm);
-        $(opt + "to1").empty();
+        $(opt1).val(frm);
+        $(opt2).empty();
         //funcion de la pagina icao que actualiza el input de destino
         Reduce("second");
-        GetAirport(frm, opt + "to1", 'passenger');
-        $(opt + "to1").val('0');
+        GetAirportsPassengerByDeparture(frm, "Departure");
         //cargar variable to con la funcion getTo()
         var to = await getTo();
         //actualiza inputs de la pagina
-        $(opt + "to1").val(to);
+        $(opt2).val(to);
+        GetAirportsPassengerByDeparture(to, "Destination1");
         Reduce("second");
         // $(opt + "frm3").val(frm);
     }).catch(error => {
@@ -99,7 +100,7 @@ async function icao(from, to) {
     //envia el formulario
     try {
         await Promise.race([
-            page.click('#computeByInput'),
+            page.click('#buttonCalculate'),
             new Promise((_, reject) => {
                 setTimeout(() => {
                     console.log("Límite de tiempo excedido")
@@ -114,11 +115,11 @@ async function icao(from, to) {
     }
 
     //div que contiene los resultados
-    await page.waitForSelector('div#h-Metric .body-content tr td div');
+    await page.waitForSelector('div#resultMetric .body-content tr td div');
 
     //codigo para extraer respuesta del navegador
     const result = await page.evaluate(async () => {
-        var table = document.querySelectorAll('div#h-Metric .body-content tr td div');
+        var table = document.querySelectorAll('div#resultMetric .body-content tr td div');
         var result = [];
 
         for (var i = 0; i < table.length; i++) {
@@ -136,19 +137,20 @@ async function icao(from, to) {
     if (result.length < 6) {
         return undefined;
     }
-
+    let origin = 7;
+    let destination = 12;
     //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
-    if (!result[4][0].includes('Passenger CO')) {
+    if (!result[origin][0].includes('Passenger CO')) {
         return undefined;
     }
 
-    if (!result[7][0].includes('Passenger CO')) {
+    if (!result[destination][0].includes('Passenger CO')) {
         return undefined;
     }
     let response = {};
-    response.main = parseInt(result[4][1].replace(/\D+/g, "")) + parseInt(result[7][1].replace(/\D+/g, ""));
-    response.detail1 = parseInt(result[4][1].replace(/\D+/g, ""));
-    response.detail2 = parseInt(result[7][1].replace(/\D+/g, ""));
+    response.main = parseInt(result[origin][1].replace(/\D+/g, "")) + parseInt(result[destination][1].replace(/\D+/g, ""));
+    response.detail1 = parseInt(result[origin][1].replace(/\D+/g, ""));
+    response.detail2 = parseInt(result[destination][1].replace(/\D+/g, ""));
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
     return response;
