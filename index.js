@@ -63,6 +63,10 @@ app.use(async (req, res, next) => {
 function sleep(s) {
     return new Promise(resolve => setTimeout(resolve, (s * 1000)));
 }
+app.get('/', async (request, response) => {
+    return response.status(200).end();
+})
+
 app.get('/calcular', async (request, response) => {
     if(!cache) loadInitialData();
     let data = request.query;
