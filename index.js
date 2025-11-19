@@ -110,22 +110,33 @@ app.get('/calcular', async (request, response) => {
     if (result == null) {
         cache.time_stamp[`${data.from}/${data.to}`] = new Date();
         cache.flights[`${data.from}/${data.to}`] = [null, null];
+        cache.fuel[`${data.to}/${data.from}`] = [null, null];
         console.log(`${data.from}/${data.to} fail`)
-        return response.json({ 'result': null }).end();
+        return response.json({ 'result': null, 'fuel': null }).end();
     }
     let main = result.main;
     let detail1 = result.detail1;
     let detail2 = result.detail2;
+
+    //flight cache
     cache.time_stamp[`${data.from}/${data.to}`] = new Date();
     cache.flights[`${data.from}/${data.to}`] = [main, detail1];
+
+
     cache.time_stamp[`${data.to}/${data.from}`] = new Date();
     cache.flights[`${data.to}/${data.from}`] = [main, detail2];
+
+    // fuel cache
+    let totalFuel=(result.fuel1 + result.fuel2)
+    cache.fuel[`${data.from}/${data.to}`] = [totalFuel, result.fuel1];
+    cache.fuel[`${data.to}/${data.from}`] = [totalFuel, result.fuel2];
+
     if (data.type == '1') {
         console.log(cache.time_stamp[`${data.from}/${data.to}`] + `${data.from}/${data.to} ` + cache.flights[`${data.from}/${data.to}`][1])
-        return response.json({ 'result': cache.flights[`${data.from}/${data.to}`][1] }).end();
+        return response.json({ 'result': cache.flights[`${data.from}/${data.to}`][1], 'fuel': cache.fuel[`${data.from}/${data.to}`][1] }).end();
     } else {
         console.log(cache.time_stamp[`${data.from}/${data.to}`] + `${data.from}/${data.to} ` + cache.flights[`${data.from}/${data.to}`][0])
-        return response.json({ 'result': cache.flights[`${data.from}/${data.to}`][0] }).end();
+        return response.json({ 'result': cache.flights[`${data.from}/${data.to}`][0], 'fuel': cache.fuel[`${data.from}/${data.to}`][0] }).end();
     }
 })
 

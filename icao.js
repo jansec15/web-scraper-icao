@@ -45,7 +45,7 @@ async function icao(from, to) {
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         //false si quiere ver el navegador, true si no quiere mostrar el navegador
-        headless: true,
+        headless: false,
         executablePath: process.env['PUPPETEER_EXECUTABLE_PATH'],
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
     }).catch(function (error) {
@@ -70,27 +70,28 @@ async function icao(from, to) {
     //crea una pestaña con la url
     await page.goto(baseurl);
 
-    await page.waitForSelector('.mainContent');
-
+    await page.waitForSelector('[aria-labelledby="select2-SelectPassengerDestination1-container"]');
     //ejecuta codigo en el navegador
     await page.evaluate(async () => {
-        var opt1 = "#selectPassengerDeparture";
-        var opt2 = "#selectPassengerDestination1";
+        var opt1 = "#SelectPassengerDeparture";
+        var opt2 = "#SelectPassengerDestination1";
         //cargar variable from con la funcion getFrom()
         var frm = await getFrom();
-
+        console.log("From: " + frm);
         //input de la pagina para origen de vuelo
         $(opt1).val(frm);
-        $(opt2).empty();
+        // $(opt2).empty();
         //funcion de la pagina icao que actualiza el input de destino
-        Reduce("second");
-        GetAirportsPassengerByDeparture(frm, "Departure");
+        // Reduce("second");
+        PassengerGetAirportsByDeparture(frm, false, "Departure");
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        await delay(500);
         //cargar variable to con la funcion getTo()
         var to = await getTo();
         //actualiza inputs de la pagina
         $(opt2).val(to);
-        GetAirportsPassengerByDeparture(to, "Destination1");
-        Reduce("second");
+        PassengerGetAirportsByDeparture(to, false, "Destination1");
+        // Reduce("second");
         // $(opt + "frm3").val(frm);
     }).catch(error => {
         console.log(error);
@@ -100,7 +101,7 @@ async function icao(from, to) {
     //envia el formulario
     try {
         await Promise.race([
-            page.click('#buttonCalculate'),
+            page.click('#calculateButton'),
             new Promise((_, reject) => {
                 setTimeout(() => {
                     console.log("Límite de tiempo excedido")
@@ -115,17 +116,30 @@ async function icao(from, to) {
     }
 
     //div que contiene los resultados
-    await page.waitForSelector('div#resultMetric .body-content tr td div');
+    await page.waitForSelector('div#ResultDivPassengerEconomyMetric .body-content-result');
 
     //codigo para extraer respuesta del navegador
     const result = await page.evaluate(async () => {
-        var table = document.querySelectorAll('div#resultMetric .body-content tr td div');
+        var table = document.querySelectorAll('div#ResultDivPassengerEconomyMetric .body-content-result');
         var result = [];
 
         for (var i = 0; i < table.length; i++) {
-            let element = table[i].querySelectorAll('label');
-            let key = element[0].innerHTML
-            let value = element[1].innerHTML;
+            let elementLabel = table[i].querySelectorAll(".result-item-label-layout label")
+            let elementValue = table[i].querySelectorAll(".result-item-value-layout label")
+            let fuel = "";
+            if (elementLabel && elementLabel[1].innerHTML == "Aircraft Fuel Burn/leg") {
+                console.log(elementLabel[1].innerHTML)
+                console.log(elementValue[1].innerHTML)
+                fuel = elementValue[1].innerHTML;
+                result.push(["Aircraft Fuel Burn/leg", fuel]);
+                continue
+            }
+            // let element = table[i].querySelectorAll('label');
+            let key = elementLabel[2].innerHTML
+            let value = elementValue[2].innerHTML;
+            if (key == "" || value == "") {
+                continue
+            }
             result.push([key, value]);
         }
         return result;
@@ -133,26 +147,31 @@ async function icao(from, to) {
     //cierra el navegador
     await browser.close();
 
-    //si por alguna razon tiene menos de 6 de longitud es que sucedio algo
-    if (result.length < 6) {
+    //si por alguna razon no tiene resultado
+    if (result.length == 0) {
         return undefined;
     }
-    let origin = 7;
-    let destination = 12;
+    // let origin = 7;
+    // let destination = 12;
     //el valor de origen y destino, trae un label que contiene Passenger si no lo contiene es que o cambio o existe problema
-    if (!result[origin][0].includes('Passenger CO')) {
-        return undefined;
-    }
+    // if (!result[origin][0].includes('Passenger CO')) {
+    //     return undefined;
+    // }
 
-    if (!result[destination][0].includes('Passenger CO')) {
-        return undefined;
-    }
+    // if (!result[destination][0].includes('Passenger CO')) {
+    //     return undefined;
+    // }
     let response = {};
-    response.main = parseInt(result[origin][1].replace(/\D+/g, "")) + parseInt(result[destination][1].replace(/\D+/g, ""));
-    response.detail1 = parseInt(result[origin][1].replace(/\D+/g, ""));
-    response.detail2 = parseInt(result[destination][1].replace(/\D+/g, ""));
+    //replace(/\D+/g, "") quita todo lo que no sea numero
+    response.main = parseFloat(result[0][1].replace(/[^0-9.]+/g,""));
+    response.detail1 = parseFloat(result[1][1].replace(/[^0-9.]+/g,""));
+    response.detail2 = parseFloat(result[3][1].replace(/[^0-9.]+/g,""));
+    response.fuel1 = parseFloat(result[2][1].replace(/[^0-9.]+/g,""));
+    response.fuel2 = parseFloat(result[4][1].replace(/[^0-9.]+/g,""));
     const end = new Date() - start;
     console.log(`Tiempo de ejecución ${end} ms`);
+    // console.log(result);
+    // console.log(response)
     return response;
 }
 
