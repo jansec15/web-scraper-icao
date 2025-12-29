@@ -46,7 +46,7 @@ async function icao(from, to) {
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         //false si quiere ver el navegador, true si no quiere mostrar el navegador
-        headless: false,
+        headless: true,
         executablePath: process.env['PUPPETEER_EXECUTABLE_PATH'],
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
     }).catch(function (error) {
