@@ -39,14 +39,14 @@ async function icao(from, to) {
         return null;
     }
     const start = new Date();
-    const baseurl = "https://applications.icao.int/icec/Home/Index";
+    const baseurl = "https://icec.icao.int/calculator";
     const puppeteer = require('puppeteer');
 
     //cargar el navegador en una variable
     const browser = await puppeteer.launch({
         headers: { "Accept-Encoding": "gzip,deflate,compress" },
         //false si quiere ver el navegador, true si no quiere mostrar el navegador
-        headless: true,
+        headless: false,
         executablePath: process.env['PUPPETEER_EXECUTABLE_PATH'],
         args: ["--no-sandbox", '--disable-setuid-sandbox', '--use-gl=egl'],
     }).catch(function (error) {
@@ -78,7 +78,7 @@ async function icao(from, to) {
             var opt2 = "#SelectPassengerDestination1";
             //cargar variable from con la funcion getFrom()
             var frm = await getFrom();
-            console.log("From: " + frm);
+            // console.log("From: " + frm);
             //input de la pagina para origen de vuelo
             $(opt1).val(frm);
             // $(opt2).empty();
@@ -92,6 +92,7 @@ async function icao(from, to) {
             //actualiza inputs de la pagina
             $(opt2).val(to);
             PassengerGetAirportsByDeparture(to, false, "Destination1");
+            await delay(500);
             // Reduce("second");
             // $(opt + "frm3").val(frm);
         }).catch(error => {
@@ -100,25 +101,19 @@ async function icao(from, to) {
         });
 
         //envia el formulario
-        try {
-            await Promise.race([
-                page.click('#calculateButton'),
-                new Promise((_, reject) => {
-                    setTimeout(() => {
-                        console.log("Límite de tiempo excedido")
-                        reject(new Error('Límite de tiempo excedido'));
-                    }, 3000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
-                })
-            ]);
-        } catch (error) {
-            console.log(error);
-            await browser.close();
-            return undefined;
-        }
-
+        await Promise.race([
+            page.click('#calculateButton'),
+            new Promise((_, reject) => {
+                setTimeout(() => {
+                    console.log("Límite de tiempo excedido")
+                    reject(new Error('Límite de tiempo excedido'));
+                }, 3000); // Tiempo límite en milisegundos (en este caso, 5 segundos)
+            })
+        ]);
+        // console.log("Formulario enviado");
         //div que contiene los resultados
         await page.waitForSelector('div#ResultDivPassengerEconomyMetric .body-content-result');
-
+        //  console.log("resultados cargados");
         //codigo para extraer respuesta del navegador
         const result = await page.evaluate(async () => {
             var table = document.querySelectorAll('div#ResultDivPassengerEconomyMetric .body-content-result');
@@ -146,7 +141,7 @@ async function icao(from, to) {
             return result;
         });
         //cierra el navegador
-        await browser.close();
+        // await browser.close();
 
         //si por alguna razon no tiene resultado
         if (result.length == 0) {
@@ -176,7 +171,7 @@ async function icao(from, to) {
         return response;
     } catch (e) {
         console.log(e)
-        return null;
+        return undefined;
     } finally {
         await browser.close();
     }
