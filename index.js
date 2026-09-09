@@ -80,19 +80,21 @@ app.get('/calcular', async (request, response) => {
     if (!countries[data.from] || !countries[data.to]) {
         return response.json({ 'result': null }).end();
     }
-    let result = null
-    var dia = 86300000 //24 horas en milisegundos
-    var limit = dia * 180
+    let result = null;
+    let fuel = null;
+    var dia = 86300000; //24 horas en milisegundos
+    var limit = dia * 180;
     cache_flight = cache.flights[`${data.from}/${data.to}`]
     is_null = cache_flight && cache.flights[`${data.from}/${data.to}`][0] == null
     is_limit_null = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= dia
     is_limit = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= limit
     if (cache_flight && ((!is_null && is_limit))) {
 
-        result = (data.type == '1') ? cache.flights[`${data.from}/${data.to}`][1] : cache.flights[`${data.from}/${data.to}`][0]
-        console.log(`${data.from}/${data.to} ${result}`)
+        result = (data.type == '1') ? cache.flights[`${data.from}/${data.to}`][1] : cache.flights[`${data.from}/${data.to}`][0];
+        fuel = (data.type == '1') ? cache.fuel[`${data.from}/${data.to}`][1] : cache.fuel[`${data.from}/${data.to}`][0];
+        console.log(`${data.from}/${data.to} ${result}`);
         // console.log(`ruta: ${data.from}/${data.to} valor: ${result}`);
-        return response.json({ 'result': result }).end();
+        return response.json({ 'result': result, 'fuel': fuel }).end();
     } else {
         let condition = 0;
         while (condition < 300) {
