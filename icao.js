@@ -173,7 +173,14 @@ async function icao(from, to) {
         console.log(e)
         return undefined;
     } finally {
-        await browser.close();
+        if (browser && browser.isConnected()) {
+            try {
+                await browser.close();
+                console.log('Navegador cerrado correctamente.');
+            } catch (closeError) {
+                console.error('Error al intentar cerrar el navegador:', closeError.message);
+            }
+        }
     }
 }
 
