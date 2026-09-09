@@ -84,7 +84,7 @@ app.get('/calcular', async (request, response) => {
     var dia = 86300000 //24 horas en milisegundos
     var limit = dia * 180
     cache_flight = cache.flights[`${data.from}/${data.to}`]
-    is_null = !cache_flight && cache.flights[`${data.from}/${data.to}`][0] == null
+    is_null = cache_flight && cache.flights[`${data.from}/${data.to}`][0] == null
     is_limit_null = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= dia
     is_limit = (new Date() - new Date(cache.time_stamp[`${data.from}/${data.to}`])) <= limit
     if (cache_flight && ((!is_null && is_limit))) {
